@@ -1,4 +1,4 @@
-# Kanban-iaed-1st_20_21
+# Kanban
 
 
  First Introduction to Algorithms and Data Structures project 
