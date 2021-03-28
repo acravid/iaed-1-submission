@@ -14,27 +14,17 @@
 #include <string.h>
 
 
-/* Macros*/
-
-                   
+/* Macros*/               
 #define START 1         /* true value for the command line parsing*/
- 
 #define TASKSMAX  10000 /* maximum number of tasks*/ 
- 
 #define TASKINFO 50     /* maximum number of characters of a task description*/
-
 #define ACTIVITYMAX 10  /* maximum number of activities in the system*/
-
 #define ACTIVITYINFO 20 /* maximum number of characters of an activity description*/
-
 #define USERMAX 50      /* maximum number of users in the system*/
-                        
-#define USERNAME 20     /* maximum number of charactes of a user description*/  
-
+#define USERNAME 20     /* maximum number of characters of an user description*/  
 
 
 /*  Definition of Structures type*/
-
 
 /*
  * Structure Name: Task_t
@@ -99,14 +89,12 @@ typedef struct{
 
 /*  (Global)*/
 
-
 /* array variables*/
 
                         /*  an array of Users in which the index indentifies the current user,
                         the system supports a
                         maximum of 50 users*/
 User_t users[USERMAX];
-
 
                         /*  an array of Activities in which the index indentifies the current
                         activity,the system allows a
@@ -118,13 +106,10 @@ Activity_t activities[ACTIVITYMAX];
                          a maximum of 1000 tasks*/
 Tasks_t tasks[TASKSMAX];
 
-
 /*  variables*/
-
 int tasks_counter;       /*  counts the number of tasks in the system*/
 int users_counter;       /*  counts the number of users in the system*/
 int activities_counter;  /*  counts the number of activities in the system*/
-
 
 // a global timer is it valid ?
 
@@ -138,9 +123,7 @@ void moveTaskActivity(); /*  moves a Task from an activity to another, command m
 void listTaskActvity();  /*  lists all tasks in a given activity, command d*/
 void addOrListActivity();/*  adds an activity or lists all activities in the system, command a*/
 
-
 /* Auxiliary Functions*/
-
 int duplicateInfo(char []);
 int isTaskinSystem(int id);
 int nonNegativeIntChecker(int time);
@@ -148,7 +131,6 @@ int isUserinSystem(char name[]);
 int isActivityinSystem(char name[]);
 int taskStage(Tasks_t task);
 int activityNameChecker(Activity_t activity);
-
 
 
 int  main(){
