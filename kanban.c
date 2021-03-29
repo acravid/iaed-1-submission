@@ -14,7 +14,7 @@
 #include <string.h>
 
 
-/* Macros*/               
+/*  Macros*/               
 #define START 1         /* true value for the command line parsing*/
 #define TASKSMAX  10000 /* maximum number of tasks*/ 
 #define TASKINFO 50     /* maximum number of characters of a task description*/
@@ -92,9 +92,6 @@ typedef struct{
 
 }Tasks_t;
 
-
- 
-
 /*  (Global)*/
 
 /* array variables*/
@@ -114,33 +111,37 @@ Activity_t activities[ACTIVITYMAX];
                          a maximum of 1000 tasks*/
 Tasks_t tasks[TASKSMAX];
 
+
+
 /*  variables*/
 int tsk_counter;       /*  counts the number of tasks in the system*/
 int usr_counter;       /*  counts the number of users in the system*/
-int act_counter;  /*  counts the number of activities in the system*/
-
-// a global timer is it valid ?
+int act_counter;       /*  counts the number of activities in the system*/
+int clock;             /*  current time in the system, associated with the command n*/
+int task_id_tracker;    /*  tracks */
 
 /*  Function Prototypes*/
 
 void addTaskToSystem();  /*  adds a new task to the system, command: t*/
 void listTask();         /*  lists tasks in the system, command l*/
 void advanceTimeSystem();/*  advances time of the system, command n*/
-void addUserListUser();  /*adds an user or lists all the users in the system, command u */
+void addUserListUser();  /*  adds an user or lists all the users in the system, command u */
 void moveTaskActivity(); /*  moves a Task from an activity to another, command m */
 void listTaskActvity();  /*  lists all tasks in a given activity, command d*/
 void addOrListActivity();/*  adds an activity or lists all activities in the system, command a*/
 
 /* Auxiliary Functions*/
-int duplicateInfo(char []);
-int isTaskinSystem(int id);
-int nonNegativeIntChecker(int time);
-int isUserinSystem(char name[]);
-int isActivityinSystem(char name[]);
-int taskStage(Tasks_t task);
-int activityNameChecker(Activity_t activity);
-int  commandUchecker();
-int isTaskInfoDuplicated(char s[]);
+
+
+int isTaskinSystem(int id); /* done  */
+int nonNegativeIntChecker(int time); 
+int isUserinSystem(char name[]); /*done*/
+/*
+int isActivityinSystem(char name[]); // not  
+int taskStage(Tasks_t task); // not  
+int activityNameChecker(Activity_t activity); // not 
+*/
+int isTaskInfoDuplicated(char s[]);  /*done */ 
 
 
 
@@ -216,21 +217,26 @@ int isUserinSystem(char name[]){
     int i;
 
     for(i = 0; i < usr_counter; i++){
-        if(users[i].name == name){
+        if(strcmp(users[i].name,name) == false){
             return true;
         }
     }
     return false;
 }
 
+/* verifies if the task with the given id is in the system*/
+int isTaskinSystem(int id){
 
+    int i;
+    for(i = 0; i < tsk_counter; i++){
+        if(tasks[tsk_counter].id == id){
+            return true;
+        }
+    }
+    return false;
+}
 
-
-int isTaskinSystem(int id){};
-
-int isActivityinSystem(char name[]){};
-int taskStage(Tasks_t task){};
-int activityNameChecker(Activity_t activity){};
+ /*  main functions */
 
 
 void addTaskToSystem(){
@@ -251,7 +257,7 @@ void addTaskToSystem(){
             tasks[tsk_counter].duration = duration;
             tasks[tsk_counter].id = tsk_counter + ONE;
             strcpy(tasks[tsk_counter].info,info);
-            printf("task %d",tasks[tsk_counter].id);
+            printf("task %d\n",tasks[tsk_counter].id);
             tsk_counter++;
         }       
     }
@@ -259,54 +265,74 @@ void addTaskToSystem(){
 }
 
 void  listTask(){
+    /*int c,status = false,i;*/
 
+    getchar(); /*removes the first white space*/
 
-}
+} 
 
 void  advanceTimeSystem(){
 
+    int duration;
+    scanf("%d",&duration);
 
-}
-
-void  addUserListUser(){
-
-    char name[USERMAX];
-    int i;
-    
-
-    scanf("%[^\n]s",name);
-
-    if(strlen(name) == 0){
-        for(i = 0; i < usr_counter; i++){
-            printf("%s\n",users[usr_counter].name);
-        }
+    if(!nonNegativeIntChecker(duration)){
+        printf("invalid time");
 
     }
     else{
-        if(usr_counter > USERMAX){
+        clock++;
+        printf("%d\n",clock);
+        
+    }
+
+
+}
+
+void  addUserListUser(){ /*Command u*/
+    char user[USERMAX];
+    int i = 0,savechar,c;      /*associado a presenca unicamente de carateres brancos */
+
+    /*removes the first white space immediately after the u command */
+    getchar();
+
+    savechar = getchar(); /*checks whether or not the following character is a blank space */
+    putchar(savechar);
+
+    if(!(isspace(savechar))){
+
+        user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*/
+	    while ((c=getchar())!='\n' && c!=EOF && i < USERNAME){
+            user[i++] = c;
+        }
+        user[i] = '\0';
+        if(isUserinSystem(user)){
+            print("user already exists");
+
+        }
+        else if(usr_counter > USERMAX){
             printf("too many users");
         }
-        else if(isUserinSystem(name)){
-            printf("user already exists");
-        }
         else{
-            strcpy(users[usr_counter].name,name);
-            printf("%s",users[usr_counter].name);
-            usr_counter++;
+        printf("%s",user);
+        strcpy(users[usr_counter].name,user); 
+        usr_counter++;  /*increases the number of users in the system*/
         }
-    }   
+    }
+    else{
+        putchar('a');
+    }
+    
+    
 }
-
-        
 
 void moveTaskActivity(){
-    
-
+    ;
 }
 void listTaskActvity(){
-
+    ;
 
 }
 void addOrListActivity(){
-
+    ;
 }
