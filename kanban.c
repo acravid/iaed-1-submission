@@ -21,37 +21,16 @@
 #define ACTIVITYMAX 10  /* maximum number of activities in the system*/
 #define ACTIVITYINFO 20 /* maximum number of characters of an activity description*/
 #define USERMAX 50      /* maximum number of users in the system*/
-#define USERNAME 20     /* maximum number of characters of an user description*/  
+#define USERNAME 20     /* maximum number of characters of an user description*/
+#define ONE 1           /* comparison/computation value*/
 
+  
+
+
+/*booleans definitons*/
+typedef enum {false = 0,true = !false}boolean;
 
 /*  Definition of Structures type*/
-
-/*
- * Structure Name: Task_t
- * ----------------------
- * Description: Task structure definition
- * A task is characterized by the following:
- * 
- *          * an identifier,    id
- *          * a description,    info
- *          * an user
- *          * an activity 
- *          * a duration
- *          * a starting time   instant
- * 
- */
-
-typedef struct{ 
-
-    short int id;
-    char info[TASKINFO];
-    User_t user;
-    Activity_t activity;
-    short int duration;
-    short int instant;
-
-}Tasks_t;
-
 
 /*
  * Structure Name: Activity_t
@@ -86,6 +65,34 @@ typedef struct{
 
 }User_t;
 
+/*
+ * Structure Name: Task_t
+ * ----------------------
+ * Description: Task structure definition
+ * A task is characterized by the following:
+ * 
+ *          * an identifier,    id
+ *          * a description,    info
+ *          * an user
+ *          * an activity 
+ *          * a duration
+ *          * a starting time   instant
+ * 
+ */
+
+typedef struct{ 
+
+    short int id;
+    char info[TASKINFO];
+    User_t user;
+    Activity_t activity;
+    short int duration;
+    short int instant;
+
+}Tasks_t;
+
+
+ 
 
 /*  (Global)*/
 
@@ -107,9 +114,9 @@ Activity_t activities[ACTIVITYMAX];
 Tasks_t tasks[TASKSMAX];
 
 /*  variables*/
-int tasks_counter;       /*  counts the number of tasks in the system*/
-int users_counter;       /*  counts the number of users in the system*/
-int activities_counter;  /*  counts the number of activities in the system*/
+int tsk_counter;       /*  counts the number of tasks in the system*/
+int usr_counter;       /*  counts the number of users in the system*/
+int act_counter;  /*  counts the number of activities in the system*/
 
 // a global timer is it valid ?
 
@@ -148,7 +155,7 @@ int  main(){
                 addTaskToSystem();
                 break;
 
-            case    'l':
+          /*  case    'l':
                 listTask();
                 break;
 
@@ -170,9 +177,65 @@ int  main(){
 
             case    'a':
                 addOrListActivity();
-                break;
+                break; */
         }
         
     }
     return EXIT_FAILURE;
+}
+
+
+/* Auxiliary Functions Definitions*/
+
+int  nonNegativeIntChecker(int num){
+    
+    int res;
+    res = (num >= false) ? true:false;
+    return res;
+}
+
+int isInfoDuplicated(char s[]){
+
+    int i;
+    
+    for(i = 0; i < tsk_counter;i++){
+        if(tasks[tsk_counter].info == s){
+            return true;
+        }
+    }
+    return false;
+}
+
+int isTaskinSystem(int id){};
+int isUserinSystem(char name[]){};
+int isActivityinSystem(char name[]){};
+int taskStage(Tasks_t task){};
+int activityNameChecker(Activity_t activity){};
+int isInfoDuplicated();
+
+
+void addTaskToSystem(){
+
+    int duration;
+    char info[TASKINFO];
+    scanf("%d%[^\n]s",&duration,info);
+
+    if(!(info[0] == '\0') && nonNegativeIntChecker(duration)){
+        
+        if(tsk_counter > TASKSMAX){
+            printf("too many tasks");
+        }
+        else if(isInfoDuplicated(info)){
+            printf("duplicate description");
+        }
+        else{
+            tasks[tsk_counter].duration = duration;
+            tasks[tsk_counter].id = tsk_counter + ONE;
+            strcpy(tasks[tsk_counter].info,info);
+            printf("task %d",tasks[tsk_counter].id);
+            printf("%s",info);
+            tsk_counter++;
+        }       
+    }
+
 }
