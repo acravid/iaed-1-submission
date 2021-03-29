@@ -45,6 +45,7 @@ typedef enum {false = 0,true = !false}boolean;
 typedef struct{
 
     char name[ACTIVITYINFO];
+    
 
 }Activity_t;
 
@@ -125,7 +126,7 @@ int act_counter;  /*  counts the number of activities in the system*/
 void addTaskToSystem();  /*  adds a new task to the system, command: t*/
 void listTask();         /*  lists tasks in the system, command l*/
 void advanceTimeSystem();/*  advances time of the system, command n*/
-void addUserListUser();  /*  adds an user or lists all the users in the system, command u */
+void addUserListUser();  /*adds an user or lists all the users in the system, command u */
 void moveTaskActivity(); /*  moves a Task from an activity to another, command m */
 void listTaskActvity();  /*  lists all tasks in a given activity, command d*/
 void addOrListActivity();/*  adds an activity or lists all activities in the system, command a*/
@@ -138,6 +139,9 @@ int isUserinSystem(char name[]);
 int isActivityinSystem(char name[]);
 int taskStage(Tasks_t task);
 int activityNameChecker(Activity_t activity);
+int  commandUchecker();
+int isTaskInfoDuplicated(char s[]);
+
 
 
 int  main(){
@@ -155,7 +159,7 @@ int  main(){
                 addTaskToSystem();
                 break;
 
-          /*  case    'l':
+            case    'l':
                 listTask();
                 break;
 
@@ -164,7 +168,7 @@ int  main(){
                 break;
 
             case    'u':
-                addUserListUser();
+                addUserListUser(); 
                 break;
 
             case    'm':
@@ -177,7 +181,7 @@ int  main(){
 
             case    'a':
                 addOrListActivity();
-                break; */
+                break; 
         }
         
     }
@@ -194,7 +198,7 @@ int  nonNegativeIntChecker(int num){
     return res;
 }
 
-int isInfoDuplicated(char s[]){
+int isTaskInfoDuplicated(char s[]){
 
     int i;
     
@@ -206,12 +210,27 @@ int isInfoDuplicated(char s[]){
     return false;
 }
 
+/* verifies if an user name is already in the system*/
+int isUserinSystem(char name[]){
+
+    int i;
+
+    for(i = 0; i < usr_counter; i++){
+        if(users[i].name == name){
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+
 int isTaskinSystem(int id){};
-int isUserinSystem(char name[]){};
+
 int isActivityinSystem(char name[]){};
 int taskStage(Tasks_t task){};
 int activityNameChecker(Activity_t activity){};
-int isInfoDuplicated();
 
 
 void addTaskToSystem(){
@@ -225,7 +244,7 @@ void addTaskToSystem(){
         if(tsk_counter > TASKSMAX){
             printf("too many tasks");
         }
-        else if(isInfoDuplicated(info)){
+        else if(isTaskInfoDuplicated(info)){
             printf("duplicate description");
         }
         else{
@@ -233,9 +252,61 @@ void addTaskToSystem(){
             tasks[tsk_counter].id = tsk_counter + ONE;
             strcpy(tasks[tsk_counter].info,info);
             printf("task %d",tasks[tsk_counter].id);
-            printf("%s",info);
             tsk_counter++;
         }       
     }
+
+}
+
+void  listTask(){
+
+
+}
+
+void  advanceTimeSystem(){
+
+
+}
+
+void  addUserListUser(){
+
+    char name[USERMAX];
+    int i;
+    
+
+    scanf("%[^\n]s",name);
+
+    if(strlen(name) == 0){
+        for(i = 0; i < usr_counter; i++){
+            printf("%s\n",users[usr_counter].name);
+        }
+
+    }
+    else{
+        if(usr_counter > USERMAX){
+            printf("too many users");
+        }
+        else if(isUserinSystem(name)){
+            printf("user already exists");
+        }
+        else{
+            strcpy(users[usr_counter].name,name);
+            printf("%s",users[usr_counter].name);
+            usr_counter++;
+        }
+    }   
+}
+
+        
+
+void moveTaskActivity(){
+    
+
+}
+void listTaskActvity(){
+
+
+}
+void addOrListActivity(){
 
 }
