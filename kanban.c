@@ -15,16 +15,18 @@
 
 
 /*  Macros*/               
-#define START 1         /* true value for the command line parsing*/
-#define TASKSMAX  10000 /* maximum number of tasks*/ 
-#define TASKINFO 50     /* maximum number of characters of a task description*/
-#define ACTIVITYMAX 10  /* maximum number of activities in the system*/
-#define ACTIVITYINFO 20 /* maximum number of characters of an activity description*/
-#define USERMAX 50      /* maximum number of users in the system*/
-#define USERNAME 20     /* maximum number of characters of an user description*/
-#define ONE 1           /* comparison/computation value*/
-
-  
+#define START 1                 /* true value for the command line parsing*/
+#define TASKSMAX  10000         /* maximum number of tasks*/ 
+#define TASKINFO 50             /* maximum number of characters of a task description*/
+#define ACTIVITYMAX 10          /* maximum number of activities in the system*/
+#define ACTIVITYINFO 20         /* maximum number of characters of an activity description*/
+#define USERMAX 50              /* maximum number of users in the system*/
+#define USERNAME 20             /* maximum number of characters of an user description*/
+#define ONE 1                   /* comparison/computation value*/
+#define ZERO 0                  /* comparison/computation value*/
+#define STAGE1 "TO DO"          /* first stage of an activity*/
+#define STAGE2 "IN PROGRESS"7   /*second stage of an activity*/
+#define STAGE3 "DONE"           /*last stage of an activity*/
 
 
 /*booleans definitons*/
@@ -114,10 +116,10 @@ Tasks_t tasks[TASKSMAX];
 
 
 /*  variables*/
-int tsk_counter;       /*  counts the number of tasks in the system*/
-int usr_counter;       /*  counts the number of users in the system*/
-int act_counter;       /*  counts the number of activities in the system*/
-int clock;             /*  current time in the system, associated with the command n*/
+int tsk_counter;        /*  counts the number of tasks in the system*/
+int usr_counter;        /*  counts the number of users in the system*/
+int act_counter;        /*  counts the number of activities in the system*/
+int clock;              /*  current time in the system, associated with the command n*/
 int task_id_tracker;    /*  tracks */
 
 /*  Function Prototypes*/
@@ -126,7 +128,7 @@ void addTaskToSystem();  /*  adds a new task to the system, command: t*/
 void listTask();         /*  lists tasks in the system, command l*/
 void advanceTimeSystem();/*  advances time of the system, command n*/
 void addUserListUser();  /*  adds an user or lists all the users in the system, command u */
-void moveTaskActivity(); /*  moves a Task from an activity to another, command m */
+void moveTask();         /*  moves a Task from an activity to another, command m */
 void listTaskActvity();  /*  lists all tasks in a given activity, command d*/
 void addOrListActivity();/*  adds an activity or lists all activities in the system, command a*/
 
@@ -173,7 +175,7 @@ int  main(){
                 break;
 
             case    'm':
-                moveTaskActivity();
+                moveTask();
                 break;
 
             case    'd':
@@ -256,7 +258,9 @@ void addTaskToSystem(){
         else{
             tasks[tsk_counter].duration = duration;
             tasks[tsk_counter].id = tsk_counter + ONE;
+            tasks[tsk_counter].instant = ZERO;
             strcpy(tasks[tsk_counter].info,info);
+            strcpy(tasks[tsk_counter].activity.name,STAGE1);
             printf("task %d\n",tasks[tsk_counter].id);
             tsk_counter++;
         }       
@@ -290,44 +294,56 @@ void  advanceTimeSystem(){
 }
 
 void  addUserListUser(){ /*Command u*/
-    char user[USERMAX];
-    int i = 0,savechar,c;      /*associado a presenca unicamente de carateres brancos */
+    char user[USERNAME];
+    int i = 1,j,savechar,c;     
 
     /*removes the first white space immediately after the u command */
     getchar();
 
     savechar = getchar(); /*checks whether or not the following character is a blank space */
-    putchar(savechar);
 
-    if(!(isspace(savechar))){
+
+    if(!(isspace(savechar))){ /*verifies if we're dealing with a list users or a
+                            create user command*/
 
         user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*/
 	    while ((c=getchar())!='\n' && c!=EOF && i < USERNAME){
             user[i++] = c;
         }
         user[i] = '\0';
-        if(isUserinSystem(user)){
-            print("user already exists");
+        if(isUserinSystem(user)){ /*tests for errors*/
+            printf("user already exists");
 
         }
         else if(usr_counter > USERMAX){
             printf("too many users");
         }
-        else{
-        printf("%s",user);
+        else{           /* creates a new user */
         strcpy(users[usr_counter].name,user); 
         usr_counter++;  /*increases the number of users in the system*/
         }
     }
-    else{
-        putchar('a');
+    else{ /*list all names in system by insertion order*/
+        for(j = 0; j < usr_counter; j++){
+            printf("%s\n",users[usr_counter].name);
+        }
     }
     
     
 }
 
-void moveTaskActivity(){
-    ;
+void moveTask(){
+
+    int id;
+    char user[USERNAME], activity[ACTIVITYINFO];
+    
+    scanf("%d %s %s",&id,user,activity);
+
+    if(isTaskinSystem(id) == false){
+        printf("no such task");
+    }
+
+
 }
 void listTaskActvity(){
     ;
