@@ -1,7 +1,7 @@
 /*
  *
- *File: kanban.c
- *Author: Allan Donizette Cravid Fernades, nº 97281
+ *File:        kanban.c
+ *Author:      Allan Donizette Cravid Fernades 97281
  *Description: a schedulling system for tasks management
  *  
  */
@@ -25,11 +25,12 @@
 #define ONE 1                   /* comparison/computation value*/
 #define ZERO 0                  /* comparison/computation value*/
 #define STAGE1 "TO DO"          /* first stage of an activity*/
-#define STAGE2 "IN PROGRESS"7   /*second stage of an activity*/
+#define STAGE2 "IN PROGRESS"    /*second stage of an activity*/
 #define STAGE3 "DONE"           /*last stage of an activity*/
 
 
-/*booleans definitons*/
+/*booleans definiton*/
+
 typedef enum {false = 0,true = !false}boolean;
 
 /*  Definition of Structures type*/
@@ -120,7 +121,8 @@ int tsk_counter;        /*  counts the number of tasks in the system*/
 int usr_counter;        /*  counts the number of users in the system*/
 int act_counter;        /*  counts the number of activities in the system*/
 int clock;              /*  current time in the system, associated with the command n*/
-int task_id_tracker;    /*  tracks */
+
+int task_id_tracker;    /*  tracks  think about */
 
 /*  Function Prototypes*/
 
@@ -192,7 +194,7 @@ int  main(){
 }
 
 
-/* Auxiliary Functions Definitions*/
+/* Auxiliary Functions */
 
 int  nonNegativeIntChecker(int num){
     
@@ -201,12 +203,13 @@ int  nonNegativeIntChecker(int num){
     return res;
 }
 
+/* verifies if the task given as a argument is already in the system*/
 int isTaskInfoDuplicated(char s[]){
 
     int i;
     
     for(i = 0; i < tsk_counter;i++){
-        if(tasks[tsk_counter].info == s){
+        if(strcmp(users[i].name,s) == false){
             return true;
         }
     }
@@ -241,12 +244,14 @@ int isTaskinSystem(int id){
  /*  main functions */
 
 
-void addTaskToSystem(){
+void addTaskToSystem(){ /*Command t*/
 
     int duration;
     char info[TASKINFO];
-    scanf("%d%[^\n]s",&duration,info);
-
+    scanf("%d",&duration);
+    getchar();          /*removes the first character after the duration -- integer*/
+    scanf("%[^\n]s",info);/*the description cannot start with a whitespace*/
+  
     if(!(info[0] == '\0') && nonNegativeIntChecker(duration)){
         
         if(tsk_counter > TASKSMAX){
@@ -294,18 +299,19 @@ void  advanceTimeSystem(){
 }
 
 void  addUserListUser(){ /*Command u*/
+
     char user[USERNAME];
     int i = 1,j,savechar,c;     
 
     /*removes the first white space immediately after the u command */
     getchar();
 
-    savechar = getchar(); /*checks whether or not the following character is a blank space */
+    savechar = getchar(); /*saves the character after the whitespace to check later*/  
 
-
-    if(!(isspace(savechar))){ /*verifies if we're dealing with a list users or a
+                             /*checks whether or not the saved character is a  whitespace */
+    if(!(isspace(savechar))){/*verifies if we're dealing with a list users or a
                             create user command*/
-
+      
         user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*/
 	    while ((c=getchar())!='\n' && c!=EOF && i < USERNAME){
             user[i++] = c;
@@ -319,13 +325,15 @@ void  addUserListUser(){ /*Command u*/
             printf("too many users");
         }
         else{           /* creates a new user */
+      
         strcpy(users[usr_counter].name,user); 
         usr_counter++;  /*increases the number of users in the system*/
         }
     }
     else{ /*list all names in system by insertion order*/
-        for(j = 0; j < usr_counter; j++){
-            printf("%s\n",users[usr_counter].name);
+
+            for(j = 0; j < usr_counter; j++){
+                printf("%s\n",users[j].name);
         }
     }
     
