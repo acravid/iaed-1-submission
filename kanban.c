@@ -353,10 +353,8 @@ void  addUserListUser(){       /*Command u*/
                             /*checks whether or not the saved character is a  whitespace */
     if(!(isspace(savechar))){/*verifies if we're dealing with a list users or a
                              create user command*/
-      
         user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*/
-        
-	    while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
+        while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
             user[i++] = c;
         }
         user[i] = '\0';
@@ -432,8 +430,7 @@ void addOrListActivity(){ /*check if the given string does not have lowercase le
                              /*tests for errors*/
 
         activity[0] = savechar;/*saves the first non whitespace character to an auxiliary array*/
-
-	    while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
+	while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
 
             if(islower(c)){    /*checks for nonvalid characters*/
                 printf("invalid description");
