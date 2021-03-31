@@ -28,6 +28,14 @@
 #define STAGE2 "IN PROGRESS"    /*second stage of an activity*/
 #define STAGE3 "DONE"           /*last stage of an activity*/
 
+/*  Macros to make the sorting algorithm more abstract*/
+#define key(A) (A)
+#define less(A,B) (key(A) < key(B))
+
+/* used in sorting*/
+typedef int Item;
+Item auxCMDd[TASKSMAX];         /*auxiliary array used in sorting,command d*/
+Item auxCMDl[TASKSMAX];         /*auxiliary array used in sorting,command d*/
 
 /*booleans definiton*/
 
@@ -150,47 +158,43 @@ int activityNameChecker(Activity_t activity); // not
 int isTaskInfoDuplicated(char s[]);  /*done */ 
 int isActivityInfoDuplicated(char s[]); /**/
 
+/*  Sorting*/
+void mergesort(Item a[],Item aux[], int l, int r);
+void merge(Item a[],Item aux[],int l, int m, int r); 
+
 
 int  main(){
 
     char cmd;
 
     while(START){
-        
+
         cmd = getchar();
         switch(cmd){
             case    'q':
                 return EXIT_SUCCESS;
-
             case    't':
                 addTaskToSystem();
                 break;
-
             case    'l':
                 listTask();
                 break;
-
             case    'n':
                 advanceTimeSystem();
                 break;
-
             case    'u':
                 addUserListUser(); 
                 break;
-
             case    'm':
                 moveTask();
                 break;
-
             case    'd':
                 listTaskActvity();
                 break;
-
             case    'a':
                 addOrListActivity();
                 break; 
         }
-        
     }
     return EXIT_FAILURE;
 }
@@ -299,10 +303,10 @@ void addTaskToSystem(){ /*Command t*/
     if(!(info[0] == '\0') && nonNegativeIntChecker(duration)){
         
         if(tsk_counter > TASKSMAX){
-            printf("too many tasks");
+            printf("too many tasks\n");
         }
         else if(isTaskInfoDuplicated(info)){
-            printf("duplicate description");
+            printf("duplicate description\n");
         }
         else{
             tasks[tsk_counter].duration = duration;
@@ -313,6 +317,9 @@ void addTaskToSystem(){ /*Command t*/
             printf("task %d\n",tasks[tsk_counter].id);
             tsk_counter++;
         }       
+    }
+    else{
+        printf("invalid duration\n");
     }
 
 }
@@ -330,7 +337,7 @@ void  advanceTimeSystem(){
     scanf("%d",&duration);
 
     if(!nonNegativeIntChecker(duration)){
-        printf("invalid time");
+        printf("invalid time\n");
 
     }
     else{
@@ -355,16 +362,16 @@ void  addUserListUser(){       /*Command u*/
                              create user command*/
       
         user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*/
-        
+
 	    while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
             user[i++] = c;
         }
         user[i] = '\0';
         if(isUserinSystem(user)){ /*tests for errors*/
-            printf("user already exists");
+            printf("user already exists\n");
         }
         else if(usr_counter > USERMAX){
-            printf("too many users");
+            printf("too many users\n");
         }
         else{               /* creates a new user */
       
@@ -391,22 +398,22 @@ void moveTask(){
     tasks[id- ONE].instant = ONE; /*Testing*/
 
     if(isTaskinSystem(id) == false){ /*tests for errors*/
-        printf("no such task");
+        printf("no such task\n");
     }
     else if(taskAlreadyStarted(id,activity)){
-        printf("task already started");
+        printf("task already started\n");
     }
     else if(isUserinSystem(user) == false){
-        printf("no such user");
+        printf("no such user\n");
     }
     else if((isUserinSystem(user) == false)){
-        printf("no such activity");
+        printf("no such activity\n");
     }
     else if(taskDone(id)){
 
         duration = tasks[id - ONE].instant - clock;
         slack = duration -  tasks[id - ONE].duration;
-        printf("duration=%d slack=%d",duration,slack);
+        printf("duration=%d slack=%d\n",duration,slack);
 
         strcpy(tasks[id-ONE].user.name,user);   /* more conditions ??*/
         strcpy(tasks[id-ONE].activity.name,activity);
@@ -414,11 +421,32 @@ void moveTask(){
     }
 }
 
-void listTaskActvity(){ /*later,, sorting stuff*/
-    
+
+/*later,, sorting stuff*/
+void listTaskActvity(){     /*command d*/
+
+    int i;/*j*/
+    char activity[ACTIVITYINFO];
+   
+    getchar();              /*removes the first white space immediately after the u command */
+    scanf("%s",activity);
+
+    if(isActivityinSystem(activity)== false){
+        printf("no such activity\n");
+    }
+    else{
+
+        for(i = 0; i < tsk_counter; i++){ /*strcmp returns zero if both strings are equal*/
+            if(strcmp(tasks[i].activity.name,activity)== false){
+                auxCMDd[i] = tasks[i].id;    /*saves the id */
+            }
+        }
+
+    }
+
 
 }
-void addOrListActivity(){ /*check if the given string does not have lowercase letters*/
+void addOrListActivity(){   /*command a*/
 
     int savechar,c,i=ONE,j;
     char activity[ACTIVITYINFO];
@@ -436,17 +464,17 @@ void addOrListActivity(){ /*check if the given string does not have lowercase le
 	    while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
 
             if(islower(c)){    /*checks for nonvalid characters*/
-                printf("invalid description");
+                printf("invalid description\n");
                 break;
             }
             activity[i++] = c; 
         }
         activity[i] = '\0';
         if(isActivityInfoDuplicated(activity)){
-            printf("duplicate activity");
+            printf("duplicate activity\n");
         }
         else if(act_counter > ACTIVITYMAX ){
-            printf("too many activities");
+            printf("too many activities\n");
         }
         else{                   /*creates a new activity*/
             strcpy(activities[act_counter].name,activity);
@@ -463,4 +491,44 @@ void addOrListActivity(){ /*check if the given string does not have lowercase le
 
 
 
-/* merge sort is it ??*/
+/*  sorting*/
+
+
+/*
+ * algorithm of choice: mergesort, top-down mergesort
+ * time complexity: N log N 
+ * 
+ * sorts a file of N elements in time proportional to N log N
+ * no matter the input
+ * 
+ * 
+ */
+
+void mergesort(Item a[],Item aux[],int l, int r){
+
+	int m = (r + l) / 2;
+	if (r <= l) return;
+
+	mergesort(a,aux, l, m);     /* sorts the left part of the array */
+	mergesort(a,aux, m + 1, r); /* sorts the right part of the array */
+	merge(a,aux, l, m, r);      /* merges both sorted arrays into one sorted array */
+}
+
+void merge(Item a[],Item aux[],int l, int m, int r){
+
+	
+	int i, j, k;
+
+	                        /*builds the aux array */
+	for (i = m + 1; i > l; i--)
+		aux[i - 1] = a[i - 1];
+	for (j = m; j < r; j++)
+		aux[r + m - j] = a[j + 1];
+
+	/*sorts the aux array*/
+	for (k = l; k <= r; k++)
+		if (less(aux[j], aux[i]))
+			a[k] = aux[j--];
+		else
+			a[k] = aux[i++];
+}
