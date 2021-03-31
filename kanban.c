@@ -360,10 +360,13 @@ void  addUserListUser(){       /*Command u*/
                             /*checks whether or not the saved character is a  whitespace */
     if(!(isspace(savechar))){/*verifies if we're dealing with a list users or a
                              create user command*/
-      
         user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*/
+<<<<<<< HEAD
 
 	    while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
+=======
+        while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
+>>>>>>> c7a24b098f963d01a1490dcd5a9be214db063d39
             user[i++] = c;
         }
         user[i] = '\0';
@@ -460,8 +463,7 @@ void addOrListActivity(){   /*command a*/
                              /*tests for errors*/
 
         activity[0] = savechar;/*saves the first non whitespace character to an auxiliary array*/
-
-	    while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
+	while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
 
             if(islower(c)){    /*checks for nonvalid characters*/
                 printf("invalid description\n");
@@ -491,6 +493,7 @@ void addOrListActivity(){   /*command a*/
 
 
 
+<<<<<<< HEAD
 /*  sorting*/
 
 
@@ -532,3 +535,6 @@ void merge(Item a[],Item aux[],int l, int m, int r){
 		else
 			a[k] = aux[i++];
 }
+=======
+/* merge sort is it ??*/
+>>>>>>> c7a24b098f963d01a1490dcd5a9be214db063d39
