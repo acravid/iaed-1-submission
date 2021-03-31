@@ -355,6 +355,7 @@ void  addUserListUser(){       /*Command u*/
                              create user command*/
       
         user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*/
+        
 	    while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
             user[i++] = c;
         }
@@ -377,9 +378,7 @@ void  addUserListUser(){       /*Command u*/
             for(j = 0; j < usr_counter; j++){
                 printf("%s\n",users[j].name);
         }
-    }
-    
-    
+    } 
 }
 
 void moveTask(){
@@ -433,6 +432,7 @@ void addOrListActivity(){ /*check if the given string does not have lowercase le
                              /*tests for errors*/
 
         activity[0] = savechar;/*saves the first non whitespace character to an auxiliary array*/
+
 	    while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
 
             if(islower(c)){    /*checks for nonvalid characters*/
