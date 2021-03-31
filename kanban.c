@@ -371,7 +371,7 @@ void  addUserListUser(){       /*Command u*/
         usr_counter++;      /*increases the number of users in the system*/
         }
     }
-    else{                   /*lists all user in the system by insertion order*/
+    else{                   /*lists all users in the system by insertion order*/
 
 
             for(j = 0; j < usr_counter; j++){
@@ -435,7 +435,7 @@ void addOrListActivity(){ /*check if the given string does not have lowercase le
         activity[0] = savechar;/*saves the first non whitespace character to an auxiliary array*/
 	    while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
 
-            if(islower(c)){
+            if(islower(c)){    /*checks for nonvalid characters*/
                 printf("invalid description");
                 break;
             }
@@ -456,6 +456,7 @@ void addOrListActivity(){ /*check if the given string does not have lowercase le
     else{                       /*lists all activities in the system by insertion order*/
             for(j = 0; j < act_counter; j++){
                 printf("%s\n",activities[j].name);
+            }
     }
 
 }
