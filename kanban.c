@@ -249,7 +249,7 @@ int isActivityinSystem(char activity[]){
 
     int i;
 
-    for(i = 0; i < tsk_counter; i++){
+    for(i = 0; i < act_counter; i++){
         if(strcmp(activities[i].name,activity) == false){
             return true;
         }
@@ -388,6 +388,8 @@ void moveTask(){
     }
     else{
         strcpy(tasks[id-ONE].user.name,user);
+        strcpy(tasks[id-ONE].activity.name,activity);
+
 
     }
 
