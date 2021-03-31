@@ -326,7 +326,6 @@ void addTaskToSystem(){ /*Command t*/
 
 void  listTask(){
     /*int c,status = false,i;*/
-
     getchar(); /*removes the first white space*/
 
 } 
@@ -361,7 +360,7 @@ void  addUserListUser(){       /*Command u*/
     if(!(isspace(savechar))){/*verifies if we're dealing with a list users or a
                              create user command*/
         user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*/
-	while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
+        while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
             user[i++] = c;
         }
         user[i] = '\0';
@@ -390,11 +389,8 @@ void moveTask(){
 
     int id,duration,slack;
     char user[USERNAME], activity[ACTIVITYINFO];
-    
+
     scanf("%d %s %[^\n]s",&id,user,activity);
-
-    tasks[id- ONE].instant = ONE; /*Testing*/
-
     if(isTaskinSystem(id) == false){ /*tests for errors*/
         printf("no such task\n");
     }
@@ -435,8 +431,9 @@ void listTaskActvity(){     /*command d*/
     else{
 
         for(i = 0; i < tsk_counter; i++){ /*strcmp returns zero if both strings are equal*/
-            if(strcmp(tasks[i].activity.name,activity)== false){
-                auxCMDd[i] = tasks[i].id;    /*saves the id */
+                                          /*checks for same activity in tasks*/
+            if(strcmp(tasks[i].activity.name,activity)== false){ 
+                auxCMDd[i] = tasks[i].id; /*saves the id to an auxiliary array*/
             }
         }
 
@@ -456,10 +453,8 @@ void addOrListActivity(){   /*command a*/
                             /*checks whether or not the saved character is a whitespace */
     if(!(isspace(savechar))){/*verifies if we're dealing with a list activities or a*/
                              /*tests for errors*/
-
         activity[0] = savechar;/*saves the first non whitespace character to an auxiliary array*/
-	while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
-
+	    while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
             if(islower(c)){    /*checks for nonvalid characters*/
                 printf("invalid description\n");
                 break;
@@ -485,7 +480,6 @@ void addOrListActivity(){   /*command a*/
     }
 
 }
-
 
 
 
@@ -530,3 +524,4 @@ void merge(Item a[],Item aux[],int l, int m, int r){
 		else
 			a[k] = aux[i++];
 }
+/* merge sort is it ??*/
