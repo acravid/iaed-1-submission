@@ -140,9 +140,10 @@ void addOrListActivity();/*  adds an activity or lists all activities in the sys
 int isTaskinSystem(int id); /* done  */
 int nonNegativeIntChecker(int time); 
 int isUserinSystem(char name[]); /*done*/
-/*
+int taskAlreadyStarted(int id,char activity[]);
+
 int isActivityinSystem(char name[]); // not  
-int taskStage(Tasks_t task); // not  
+/*int taskStage(Tasks_t task); // not  
 int activityNameChecker(Activity_t activity); // not 
 */
 int isTaskInfoDuplicated(char s[]);  /*done */ 
@@ -193,9 +194,11 @@ int  main(){
     return EXIT_FAILURE;
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 
 /* Auxiliary Functions */
 
+/*checks for non negative integers*/
 int  nonNegativeIntChecker(int num){
     
     int res;
@@ -203,7 +206,7 @@ int  nonNegativeIntChecker(int num){
     return res;
 }
 
-/* verifies if the task given as a argument is already in the system*/
+/* checks if the given task is already in the system*/
 int isTaskInfoDuplicated(char s[]){
 
     int i;
@@ -233,14 +236,34 @@ int isUserinSystem(char name[]){
 int isTaskinSystem(int id){
 
     int i;
-    for(i = 0; i < tsk_counter; i++){
-        if(tasks[tsk_counter].id == id){
+
+    for(i = 0; i <= tsk_counter; i++){
+        if(tasks[tsk_counter].id == id-ONE){ /*id starts at one, the - ONE removes the offset*/
             return true;
         }
     }
     return false;
 }
 
+int isActivityinSystem(char activity[]){
+
+    int i;
+
+    for(i = 0; i < tsk_counter; i++){
+        if(strcmp(activities[i].name,activity) == false){
+            return true;
+        }
+    }
+    return false;
+}
+/*  verifies if a task already started*/
+int taskAlreadyStarted(int id,char activity[]){
+
+    return (tasks[id - ONE].instant > ZERO && (strcmp(activity,STAGE1) == false)); 
+}
+
+
+/*-----------------------------------------------------------------------------------------------*/
  /*  main functions */
 
 
@@ -249,7 +272,7 @@ void addTaskToSystem(){ /*Command t*/
     int duration;
     char info[TASKINFO];
     scanf("%d",&duration);
-    getchar();          /*removes the first character after the duration -- integer*/
+    getchar();           /*removes the first character after the duration -- integer*/
     scanf("%[^\n]s",info);/*the description cannot start with a whitespace*/
   
     if(!(info[0] == '\0') && nonNegativeIntChecker(duration)){
@@ -290,7 +313,7 @@ void  advanceTimeSystem(){
 
     }
     else{
-        clock++;
+        clock += duration;
         printf("%d\n",clock);
         
     }
@@ -345,10 +368,27 @@ void moveTask(){
     int id;
     char user[USERNAME], activity[ACTIVITYINFO];
     
-    scanf("%d %s %s",&id,user,activity);
+    scanf("%d %s %[^\n]s",&id,user,activity);
+
+    tasks[id- ONE].instant = ONE; /*Testing*/
 
     if(isTaskinSystem(id) == false){
         printf("no such task");
+    }
+    else if(taskAlreadyStarted(id,activity)){
+        printf("task already started");
+
+    }
+    else if(isUserinSystem(user) == false){
+        printf("no such user");
+
+    }
+    else if((isUserinSystem(user) == false)){
+        printf("no such activity");
+    }
+    else{
+        strcpy(tasks[id-ONE].user.name,user);
+
     }
 
 
