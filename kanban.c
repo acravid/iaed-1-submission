@@ -142,12 +142,13 @@ int nonNegativeIntChecker(int time);
 int isUserinSystem(char name[]); /*done*/
 int taskAlreadyStarted(int id,char activity[]);
 int taskDone(int id);
-int isActivityinSystem(char name[]); // not  
+int isActivityinSystem(char name[]); /* not */
+
 /*int taskStage(Tasks_t task); // not  
 int activityNameChecker(Activity_t activity); // not 
 */
 int isTaskInfoDuplicated(char s[]);  /*done */ 
-
+int isActivityInfoDuplicated(char s[]); /**/
 
 
 int  main(){
@@ -217,6 +218,20 @@ int isTaskInfoDuplicated(char s[]){
         }
     }
     return false;
+}
+
+/*  checks if the given activity is already in the system*/
+int isActivityInfoDuplicated(char s[]){
+
+    int i;
+    
+    for(i = 0; i < act_counter;i++){
+        if(strcmp(activities[i].name,s) == false){
+            return true;
+        }
+    }
+    return false;
+
 }
 
 /* verifies if an user name is already in the system*/
@@ -327,39 +342,37 @@ void  advanceTimeSystem(){
 
 }
 
-void  addUserListUser(){ /*Command u*/
+void  addUserListUser(){       /*Command u*/
 
     char user[USERNAME];
-    int i = 1,j,savechar,c;     
+    int i = ONE,j,savechar,c;     
+               
+    getchar();              /*removes the first white space immediately after the u command */
+    savechar = getchar();   /*saves the character after the whitespace to check later*/  
 
-    /*removes the first white space immediately after the u command */
-    getchar();
-
-    savechar = getchar(); /*saves the character after the whitespace to check later*/  
-
-                             /*checks whether or not the saved character is a  whitespace */
+                            /*checks whether or not the saved character is a  whitespace */
     if(!(isspace(savechar))){/*verifies if we're dealing with a list users or a
-                            create user command*/
+                             create user command*/
       
         user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*/
-	    while ((c=getchar())!='\n' && c!=EOF && i < USERNAME){
+	    while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
             user[i++] = c;
         }
         user[i] = '\0';
         if(isUserinSystem(user)){ /*tests for errors*/
             printf("user already exists");
-
         }
         else if(usr_counter > USERMAX){
             printf("too many users");
         }
-        else{           /* creates a new user */
+        else{               /* creates a new user */
       
         strcpy(users[usr_counter].name,user); 
-        usr_counter++;  /*increases the number of users in the system*/
+        usr_counter++;      /*increases the number of users in the system*/
         }
     }
-    else{ /*list all names in system by insertion order*/
+    else{                   /*lists all user in the system by insertion order*/
+
 
             for(j = 0; j < usr_counter; j++){
                 printf("%s\n",users[j].name);
@@ -371,14 +384,14 @@ void  addUserListUser(){ /*Command u*/
 
 void moveTask(){
 
-    int id,duration;
+    int id,duration,slack;
     char user[USERNAME], activity[ACTIVITYINFO];
     
     scanf("%d %s %[^\n]s",&id,user,activity);
 
     tasks[id- ONE].instant = ONE; /*Testing*/
 
-    if(isTaskinSystem(id) == false){
+    if(isTaskinSystem(id) == false){ /*tests for errors*/
         printf("no such task");
     }
     else if(taskAlreadyStarted(id,activity)){
@@ -393,7 +406,8 @@ void moveTask(){
     else if(taskDone(id)){
 
         duration = tasks[id - ONE].instant - clock;
-        printf("duration=%d slack=%d",&duration,duration - tasks[id - ONE].duration);
+        slack = duration -  tasks[id - ONE].duration;
+        printf("duration=%d slack=%d",duration,slack);
 
         strcpy(tasks[id-ONE].user.name,user);   /* more conditions ??*/
         strcpy(tasks[id-ONE].activity.name,activity);
@@ -401,12 +415,49 @@ void moveTask(){
     }
 }
 
-void listTaskActvity(){ /* later,, sorting stuff*/
+void listTaskActvity(){ /*later,, sorting stuff*/
     
 
 }
-void addOrListActivity(){ /* check if the given string does not have lowercase letters*/
-    ;
+void addOrListActivity(){ /*check if the given string does not have lowercase letters*/
+
+    int savechar,c,i=ONE,j;
+    char activity[ACTIVITYINFO];
+
+    getchar();              /*removes the first white space immediately after the u command */
+    savechar = getchar();   /*saves the character after the whitespace to check later*/  
+
+    
+                            /*checks whether or not the saved character is a whitespace */
+    if(!(isspace(savechar))){/*verifies if we're dealing with a list activities or a*/
+                             /*tests for errors*/
+
+        activity[0] = savechar;/*saves the first non whitespace character to an auxiliary array*/
+	    while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
+
+            if(islower(c)){
+                printf("invalid description");
+                break;
+            }
+            activity[i++] = c; 
+        }
+        activity[i] = '\0';
+        if(isActivityInfoDuplicated(activity)){
+            printf("duplicate activity");
+        }
+        else if(act_counter > ACTIVITYMAX ){
+            printf("too many activities");
+        }
+        else{                   /*creates a new activity*/
+            strcpy(activities[act_counter].name,activity);
+            act_counter++;      /*increases the number of activities in the system*/
+        }
+    }
+    else{                       /*lists all activities in the system by insertion order*/
+            for(j = 0; j < act_counter; j++){
+                printf("%s\n",activities[j].name);
+    }
+
 }
 
 
