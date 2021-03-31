@@ -141,7 +141,7 @@ int isTaskinSystem(int id); /* done  */
 int nonNegativeIntChecker(int time); 
 int isUserinSystem(char name[]); /*done*/
 int taskAlreadyStarted(int id,char activity[]);
-
+int taskDone(int id);
 int isActivityinSystem(char name[]); // not  
 /*int taskStage(Tasks_t task); // not  
 int activityNameChecker(Activity_t activity); // not 
@@ -259,7 +259,13 @@ int isActivityinSystem(char activity[]){
 /*  verifies if a task already started*/
 int taskAlreadyStarted(int id,char activity[]){
 
-    return (tasks[id - ONE].instant > ZERO && (strcmp(activity,STAGE1) == false)); 
+    return  (tasks[id - ONE].instant > ZERO && (strcmp(activity,STAGE1) == false)); 
+}
+
+/*  verifies if a task has reached its last stage, DONE*/
+int taskDone(int id){
+
+    return  ((strcmp(tasks[id - ONE].activity.name,STAGE3) == false));
 }
 
 
@@ -365,7 +371,7 @@ void  addUserListUser(){ /*Command u*/
 
 void moveTask(){
 
-    int id;
+    int id,duration;
     char user[USERNAME], activity[ACTIVITYINFO];
     
     scanf("%d %s %[^\n]s",&id,user,activity);
@@ -377,28 +383,32 @@ void moveTask(){
     }
     else if(taskAlreadyStarted(id,activity)){
         printf("task already started");
-
     }
     else if(isUserinSystem(user) == false){
         printf("no such user");
-
     }
     else if((isUserinSystem(user) == false)){
         printf("no such activity");
     }
-    else{
-        strcpy(tasks[id-ONE].user.name,user);
+    else if(taskDone(id)){
+
+        duration = tasks[id - ONE].instant - clock;
+        printf("duration=%d slack=%d",&duration,duration - tasks[id - ONE].duration);
+
+        strcpy(tasks[id-ONE].user.name,user);   /* more conditions ??*/
         strcpy(tasks[id-ONE].activity.name,activity);
-
-
+        tasks[id - ONE].instant = clock;  /*update the starting time*/
     }
+}
 
+void listTaskActvity(){ /* later,, sorting stuff*/
+    
 
 }
-void listTaskActvity(){
+void addOrListActivity(){ /* check if the given string does not have lowercase letters*/
     ;
+}
 
-}
-void addOrListActivity(){
-    ;
-}
+
+
+/* merge sort is it ??*/
