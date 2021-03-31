@@ -360,7 +360,7 @@ void  addUserListUser(){       /*Command u*/
                             /*checks whether or not the saved character is a  whitespace */
     if(!(isspace(savechar))){/*verifies if we're dealing with a list users or a
                              create user command*/
-        user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*
+        user[0] = savechar; /*saves the first non whitespace character to an auxiliary array*/
 	while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
             user[i++] = c;
         }
@@ -530,5 +530,3 @@ void merge(Item a[],Item aux[],int l, int m, int r){
 		else
 			a[k] = aux[i++];
 }
-=======
-/* merge sort is it ??*/
