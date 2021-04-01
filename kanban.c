@@ -24,12 +24,12 @@
 #define USERNAME 20    /*maximum number of characters of an user description*/
 #define ONE 1          /*comparison/computation value*/
 #define ZERO 0         /*comparison/computation value*/
-#define STAGE1 "TO DO" /* first stage of an activity*/
-#define STAGE2 "IN PROGRESS" /*second stage of an activity*/
-#define STAGE3 "DONE"        /*last stage of an activity*/
-#define TASK    "task"
-#define DURATION "duration"
-#define SLACK    "slack"
+#define STAGE1         "TO DO" /* first stage of an activity*/
+#define STAGE2         "IN PROGRESS" /*second stage of an activity*/
+#define STAGE3         "DONE"        /*last stage of an activity*/
+#define TASK           "task"
+#define DURATION       "duration"
+#define SLACK          "slack"
 
 
 /* Macros used in error handling*/
@@ -47,7 +47,7 @@
 #define ACTFSYSTEM     "no such activity"
 #define TASKTSTARTED   "task already started"
 #define USERINSYSTEM   "user already exists"
-
+#define ZEROCHAR       '0'
 /*  Macros to make the sorting algorithm more abstract*/
 #define key(A) (A)
 #define less(A,B) (key(A) < key(B))
@@ -139,6 +139,8 @@ Activity_t activities[ACTIVITYMAX];
    externally,the system supports a maximum of 1000 tasks*/
 Tasks_t tasks[TASKSMAX];
 
+
+int listby_id[TASKSMAX]; /*stores the saved ids*/
 
 
 /*  variables*/
@@ -275,6 +277,7 @@ int isTaskinSystem(int id){
     return false;
 }
 
+/* verifies if the activity is in the system*/
 int isActivityinSystem(char activity[]){
 
     int i;
@@ -361,10 +364,31 @@ void addTaskToSystem(){
  *  command: l
  */
 
-void  listTask(){     
+void  listTask(){ 
 
+    int c,i,k;
+    i = k= ZERO;
+     /*removes the first white space immediately after the l command */ 
+    getchar();            
 
-    
+    if(!(isspace(getchar()))){/*verifies if we're dealing with a list tasks by 
+                            alphabetical order or by order of the given ids*/
+        while((c = getchar())!= '\n' && c != EOF){
+            if(!(isspace(c))){ /*checks for characters != whitespace*/
+                listby_id[i++] = c - ZERO;
+                k++;       
+            }
+        }
+        /*lists tasks by the order of the given ids*/
+        for(i = ZERO; i <= k; i++){
+            printf("%d %s #%d %s\n",tasks[i].id,tasks[i].activity.name,
+            tasks[i].duration,tasks[i].info);
+        }
+    }
+    /*SORTING STUFF*/
+    else{
+
+    }    
 } 
 
 /*
@@ -386,14 +410,11 @@ void  advanceTimeSystem(){
 
     if(!nonNegativeIntChecker(duration)){
         printf("%s\n",NONVALIDTIME);
-
     }
     else{
         clock += duration;
         printf("%d\n",clock);   
     }
-
-
 }
 
 /*
@@ -494,7 +515,7 @@ void moveTask(){
 
         duration = tasks[id - ONE].instant - clock;
         slack = duration -  tasks[id - ONE].duration;
-        printf("%s=%d %s=%d\n",DURATION,SLACK,duration,slack);
+        printf("%s=%d %s=%d\n",DURATION,duration,SLACK,slack);
 
         strcpy(tasks[id-ONE].user.name,user); 
         strcpy(tasks[id-ONE].activity.name,activity);
@@ -515,7 +536,7 @@ void moveTask(){
 
 void listTaskActvity(){     
 
-    int i,k = 0 ; /*j*/
+    int i,k = 0 ;
     char activity[ACTIVITYINFO];
 
     getchar();             
@@ -526,6 +547,7 @@ void listTaskActvity(){
     }
     else{
 
+        /*SORTING STUFF*/
         for(i = 0; i < tsk_counter; i++){ 
         /*strcmp returns zero if both strings are equal
         checks for same activity in tasks*/                                 
@@ -562,8 +584,6 @@ void addOrListActivity(){
 
     getchar();              
     savechar = getchar();  
-
-    /*verifies if we're dealing with a list activities or a*/
 
     if(!(isspace(savechar))){/*verifies if we're dealing with a list activities
                              or a create activity command*/
