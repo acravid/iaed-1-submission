@@ -391,6 +391,8 @@ void moveTask(){
     char user[USERNAME], activity[ACTIVITYINFO];
 
     scanf("%d %s %[^\n]s",&id,user,activity);
+
+    tasks[id-ONE].instant = clock;
     if(isTaskinSystem(id) == false){ /*tests for errors*/
         printf("no such task\n");
     }
@@ -403,7 +405,7 @@ void moveTask(){
     else if((isUserinSystem(user) == false)){
         printf("no such activity\n");
     }
-    else if(taskDone(id)){
+    else{
 
         duration = tasks[id - ONE].instant - clock;
         slack = duration -  tasks[id - ONE].duration;
@@ -419,7 +421,7 @@ void moveTask(){
 /*later,, sorting stuff*/
 void listTaskActvity(){     /*command d*/
 
-    int i;/*j*/
+    int i,k = 0 ; /*j*/
     char activity[ACTIVITYINFO];
    
     getchar();              /*removes the first white space immediately after the u command */
@@ -434,9 +436,10 @@ void listTaskActvity(){     /*command d*/
                                           /*checks for same activity in tasks*/
             if(strcmp(tasks[i].activity.name,activity)== false){ 
                 auxCMDd[i] = tasks[i].id; /*saves the id to an auxiliary array*/
+                k++;                      /*counts the number of tasks associated with the given 
+                                         activity*/
             }
         }
-
     }
 
 
