@@ -37,7 +37,7 @@ typedef int Item;
 Item auxCMDd[TASKSMAX];         /*auxiliary array used in sorting,command d*/
 Item auxCMDl[TASKSMAX];         /*auxiliary array used in sorting,command d*/
 
-/* booleans definiton*/
+/*booleans definiton*/
 
 typedef enum {false = 0,true = !false}boolean;
 
@@ -130,6 +130,8 @@ int usr_counter;        /*  counts the number of users in the system*/
 int act_counter;        /*  counts the number of activities in the system*/
 int clock;              /*  current time in the system, associated with the command n*/
 
+int task_id_tracker;    /*  tracks  think about */
+
 /*  Function Prototypes*/
 
 void addTaskToSystem();  /*  adds a new task to the system, command: t*/
@@ -142,14 +144,19 @@ void addOrListActivity();/*  adds an activity or lists all activities in the sys
 
 /* Auxiliary Functions*/
 
-int isTaskinSystem(int id); 
+
+int isTaskinSystem(int id); /* done  */
 int nonNegativeIntChecker(int time); 
-int isUserinSystem(char name[]);
+int isUserinSystem(char name[]); /*done*/
 int taskAlreadyStarted(int id,char activity[]);
 int taskDone(int id);
-int isActivityinSystem(char name[]); 
-int isTaskInfoDuplicated(char s[]);  
-int isActivityInfoDuplicated(char s[]);
+int isActivityinSystem(char name[]); /* not */
+
+/*int taskStage(Tasks_t task); // not  
+int activityNameChecker(Activity_t activity); // not 
+*/
+int isTaskInfoDuplicated(char s[]);  /*done */ 
+int isActivityInfoDuplicated(char s[]); /**/
 
 /*  Sorting*/
 void mergesort(Item a[],Item aux[], int l, int r);
@@ -282,28 +289,16 @@ int taskDone(int id){
 
 
 /*-----------------------------------------------------------------------------------------------*/
+ /*  main functions */
 
-/*
- *  Function: addTaskToSystem
- * 
- *  brief: adds a new task to the system
- *  reads: t <duration> <description>
- *  outputs: task <id> where <id> is the identifier of the created task
- * 
- *  errors: too many tasks
- *          duplicate description
- *          invalid duration
- * 
- *  command: t
- */
 
-void addTaskToSystem(){    
+void addTaskToSystem(){ /*Command t*/
 
     int duration;
     char info[TASKINFO];
     scanf("%d",&duration);
-    getchar();             /*removes the first character after the duration -- integer*/
-    scanf("%[^\n]s",info); /*the description cannot start with a whitespace*/
+    getchar();           /*removes the first character after the duration -- integer*/
+    scanf("%[^\n]s",info);/*the description cannot start with a whitespace*/
   
     if(!(info[0] == '\0') && nonNegativeIntChecker(duration)){
         
@@ -329,35 +324,11 @@ void addTaskToSystem(){
 
 }
 
-/*
- *  Function: listTask
- * 
- *  brief: lists tasks
- *  reads: l [<id> <id> ...]
- *  outputs: <id> <activity> #<duration> <description>
- * 
- *  errors: <id>: no such task
- *          
- *  command: l
- */
+void  listTask(){
+    /*int c,status = false,i;*/
+    getchar(); /*removes the first white space*/
 
-void  listTask(){     
-
-
-    
 } 
-
-/*
- *  Function: advanceTimeSystem
- * 
- *  brief: advances the system time
- *  reads: n <duration>
- *  outputs: <instant> where <instant> is the new current time.
- * 
- *  errors: invalid time
- *          
- *  command: n
- */
 
 void  advanceTimeSystem(){
 
@@ -377,20 +348,7 @@ void  advanceTimeSystem(){
 
 }
 
-/*
- *  Function: addUserListUser
- * 
- *  brief: adds or lists users
- *  reads: u [<user>]
- *  outputs: lists users by insertion order,one per line or nothing if an user is created
- * 
- *  errors: user already exists
- *          too many users
- *          
- *  command: u
- */
-
-void  addUserListUser(){       
+void  addUserListUser(){       /*Command u*/
 
     char user[USERNAME];
     int i = ONE,j,savechar,c;     
@@ -413,6 +371,7 @@ void  addUserListUser(){
             printf("too many users\n");
         }
         else{               /* creates a new user */
+      
         strcpy(users[usr_counter].name,user); 
         usr_counter++;      /*increases the number of users in the system*/
         }
@@ -426,22 +385,6 @@ void  addUserListUser(){
     } 
 }
 
-/*
- *  Function: moveTask
- * 
- *  brief: moves a task from an activity to another
- *  reads: m <id> <user> <activity>
- *  outputs: duration=<timesf> slack=<slack> ;timesf: time spent throughout stage1 to stage 3
- *                                           ;slack: timesf - expected time 
- *  
- *  errors: no such task
- *          task already started
- *          no such user
- *          no such activity
- *          
- *  command: m
- */
-
 void moveTask(){
 
     int id,duration,slack;
@@ -449,8 +392,7 @@ void moveTask(){
 
     scanf("%d %s %[^\n]s",&id,user,activity);
 
-    tasks[id-ONE].instant = clock; /*updates the starting time of a given activity*/
-
+    tasks[id-ONE].instant = clock;
     if(isTaskinSystem(id) == false){ /*tests for errors*/
         printf("no such task\n");
     }
@@ -475,19 +417,9 @@ void moveTask(){
     }
 }
 
-/*
- *  Function: listTaskActvity
- * 
- *  brief: lists all tasks in a given activity
- *  reads: d <ativity>
- *  outputs: <id> <starting time> <description>
- *                                        
- *  errors: no such activity
- *          
- *  command: d
- */
 
-void listTaskActvity(){     
+/*later,, sorting stuff*/
+void listTaskActvity(){     /*command d*/
 
     int i,k = 0 ; /*j*/
     char activity[ACTIVITYINFO];
@@ -512,22 +444,7 @@ void listTaskActvity(){
 
 
 }
-
-/*
- *  Function: addOrListActivity
- * 
- *  brief: adds an activity or lists all
- *  reads: a [<activity>]
- *  outputs: lists name of activities by insertion order or nothing if an activity is created
- *                                         
- *  errors: duplicate activity
- *          invalid description
- *          too many activities
- *          
- *  command: a
- */
-
-void addOrListActivity(){  
+void addOrListActivity(){   /*command a*/
 
     int savechar,c,i=ONE,j;
     char activity[ACTIVITYINFO];
