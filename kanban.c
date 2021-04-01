@@ -47,8 +47,6 @@
 #define ACTFSYSTEM     "no such activity"
 #define TASKTSTARTED   "task already started"
 #define USERINSYSTEM   "user already exists"
-#define 
-#define 
 
 /*  Macros to make the sorting algorithm more abstract*/
 #define key(A) (A)
