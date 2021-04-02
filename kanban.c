@@ -31,6 +31,8 @@
 #define DURATION       "duration"
 #define SLACK          "slack"
 #define ZEROCHAR       '0'
+#define NUL           '\0'
+
 
 /* Macros used in error handling*/
 #define MAXTASKS       "too many tasks"
@@ -132,7 +134,7 @@ User_t users[USERMAX];
 Activity_t activities[ACTIVITYMAX];
 
 /* an array of Tasks, the index + 1 indentifies the current task 
-   externally,the system supports a maximum of 1000 tasks*/
+   externally,the system supports a maximum of 10000 tasks*/
 Tasks_t tasks[TASKSMAX];
 
 
@@ -333,8 +335,9 @@ void addTaskToSystem(){
     getchar();             /*removes the first character after the duration*/
     scanf("%[^\n]s",info); /*the description cannot start with a whitespace*/
   
-    if(!(info[0] == '\0') && nonNegativeIntChecker(duration)){
-        
+    if(!(info[0] == NUL) && nonNegativeIntChecker(duration)){
+    
+
         if(tsk_counter > TASKSMAX){
             printf("%s\n",MAXTASKS);
         }
@@ -458,7 +461,7 @@ void  addUserListUser(){
         while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
             user[i++] = c;
         }
-        user[i] = '\0';
+        user[i] = NUL;
         if(isUserinSystem(user)){  /*tests for errors*/
             printf("%s\n",USERINSYSTEM);
         }
@@ -605,7 +608,7 @@ void addOrListActivity(){
             }
             activity[i++] = c; 
         }
-        activity[i] = '\0';
+        activity[i] = NUL;
         if(isActivityInfoDuplicated(activity)){
             printf("%s\n",ACTDUPLICATED);
         }
