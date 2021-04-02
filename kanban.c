@@ -30,7 +30,7 @@
 #define TASK           "task"
 #define DURATION       "duration"
 #define SLACK          "slack"
-
+#define ZEROCHAR       '0'
 
 /* Macros used in error handling*/
 #define MAXTASKS       "too many tasks"
@@ -47,15 +47,11 @@
 #define ACTFSYSTEM     "no such activity"
 #define TASKTSTARTED   "task already started"
 #define USERINSYSTEM   "user already exists"
-#define ZEROCHAR       '0'
+
 /*  Macros to make the sorting algorithm more abstract*/
 #define key(A) (A)
 #define less(A,B) (key(A) < key(B))
 
-/* used in sorting*/
-typedef int Item;
-Item auxCMDd[TASKSMAX];         /*auxiliary array used in sorting,command d*/
-Item auxCMDl[TASKSMAX];         /*auxiliary array used in sorting,command d*/
 
 /* booleans definiton*/
 
@@ -170,10 +166,16 @@ int taskDone(int id);
 int isActivityinSystem(char name[]); 
 int isTaskInfoDuplicated(char s[]);  
 int isActivityInfoDuplicated(char s[]);
+int stringHigherLower(char s[],char ss[]);
 
 /*  Sorting*/
+
+typedef Tasks_t Item;
+Item auxCMDd[TASKSMAX];         /*auxiliary array used in sorting,command d*/
+Item auxCMDl[TASKSMAX];         /*auxiliary array used in sorting,command l*/
 void mergesort(Item a[],Item aux[], int l, int r);
 void merge(Item a[],Item aux[],int l, int m, int r); 
+
 
 
 int  main(){
@@ -302,8 +304,11 @@ int taskDone(int id){
     return((strcmp(tasks[id - ONE].activity.name,STAGE3) == false)
            );
 }
-
-
+/* prints list task message*/
+void printListTask(int i){
+    printf("%d %s #%d %s\n",tasks[i].id,tasks[i].activity.name,
+    tasks[i].duration,tasks[i].info);
+}
 /*---------------------------------------------------------------------------*/
 
 /*
@@ -366,8 +371,7 @@ void addTaskToSystem(){
 
 void  listTask(){ 
 
-    int c,i,k;
-    i = k= ZERO;
+    int c,i,k = ZERO;
      /*removes the first white space immediately after the l command */ 
     getchar();            
 
@@ -381,13 +385,17 @@ void  listTask(){
         }
         /*lists tasks by the order of the given ids*/
         for(i = ZERO; i <= k; i++){
-            printf("%d %s #%d %s\n",tasks[i].id,tasks[i].activity.name,
-            tasks[i].duration,tasks[i].info);
+            printListTask(i);
         }
     }
     /*SORTING STUFF*/
+    /*lists tasks by alphabetical order of description*/
     else{
+        mergesort(tasks,auxCMDl,ZERO,tsk_counter - ONE);
 
+        for(i = 0; i < tsk_counter; i++){
+            printListTask(i);
+        }
     }    
 } 
 
@@ -446,7 +454,7 @@ void  addUserListUser(){
                               create user command*/
 
         /*saves the first non whitespace character to an auxiliary array*/                        
-        user[0] = savechar; 
+        user[ZERO] = savechar; 
         while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
             user[i++] = c;
         }
@@ -552,7 +560,7 @@ void listTaskActvity(){
         /*strcmp returns zero if both strings are equal
         checks for same activity in tasks*/                                 
             if(strcmp(tasks[i].activity.name,activity)== false){ 
-                auxCMDd[i] = tasks[i].id; /*saves the id to an auxiliary array*/
+                auxCMDd[i].id = tasks[i].id; /*saves the id to an auxiliary array*/
                 k++;  /*counts the number of tasks associated with the given 
                          activity*/
             }
@@ -656,7 +664,7 @@ void merge(Item a[],Item aux[],int l, int m, int r){
 
 	/*sorts the aux array*/
 	for (k = l; k <= r; k++)
-		if (less(aux[j], aux[i]))
+		if(strcmp(aux[i].activity.name,aux[j].activity.name) > ZERO)
 			a[k] = aux[j--];
 		else
 			a[k] = aux[i++];
