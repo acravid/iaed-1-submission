@@ -255,7 +255,7 @@ int isTaskInfoDuplicated(char s[]){
     int i;
     
     for(i = 0; i < tsk_counter;i++){
-        if(strcmpInfo(users[i].name,s) == false){
+        if(strcmp(users[i].name,s) == false){
             return true;
         }
     }
@@ -268,7 +268,7 @@ int isActivityInfoDuplicated(char s[]){
     int i;
     
     for(i = 0; i < act_counter;i++){
-        if(strcmpInfo(activities[i].name,s) == false){
+        if(strcmp(activities[i].name,s) == false){
             return true;
         }
     }
@@ -282,7 +282,7 @@ int isUserinSystem(char name[]){
     int i;
 
     for(i = 0; i < usr_counter; i++){
-        if(strcmpInfo(users[i].name,name) == false){
+        if(strcmp(users[i].name,name) == false){
             return true;
         }
     }
@@ -308,7 +308,7 @@ int isActivityinSystem(char activity[]){
     int i;
 
     for(i = 0; i < act_counter; i++){
-        if(strcmpInfo(activities[i].name,activity) == false){
+        if(strcmp(activities[i].name,activity) == false){
             return true;
         }
     }
@@ -317,18 +317,18 @@ int isActivityinSystem(char activity[]){
 /*  verifies if a task already started*/
 int taskAlreadyStarted(int id,char activity[]){
 
-    return(tasks[id - ONE].instant > ZERO || (strcmpInfo(activity,STAGE1) == true)
+    return(tasks[id - ONE].instant > ZERO || (strcmp(activity,STAGE1) == true)
           ); 
 }
 
 /*  verifies if a task has reached its last stage, DONE*/
 int taskDone(int id){
-    return((strcmpInfo(tasks[id - ONE].activity.name,STAGE3) == false));
+    return((strcmp(tasks[id - ONE].activity.name,STAGE3) == false));
 }
 
 /* */
 int cmpInfo(int i, int j){
-    return ((strcmpInfo(tasks[i].info,tasks[j].info) < ZERO) ? true: false);
+    return ((strcmp(tasks[i].info,tasks[j].info) < ZERO) ? true: false);
 }
 
 int cmpStartingTime(int i,int j){
@@ -667,7 +667,7 @@ void listTaskActvity(){
         printf("%s\n",ACTFSYSTEM);
     }
     else{
-        if(strcmpInfo(STAGE1,activity)== false){
+        if(strcmp(STAGE1,activity)== false){
 
 
         }
@@ -743,22 +743,19 @@ void mergesort(int a[],int aux[],int l, int r,int sortformat){
 
 	mergesort(a,aux, l, m,sortformat);     /* sorts the left part of the array */
 	mergesort(a,aux, m + 1, r,sortformat); /* sorts the right part of the array */
-	merge(a,aux, l, m, r,sortformat);      /* merges both sorted arrays into one sorted 
-                                array */
+	merge(a,aux, l, m, r,sortformat);      /* merges both sorted arrays into 
+                                            one sorted array */
 }
 
 void merge(int a[],int aux[],int l, int m, int r,int sortformat){
 
 	
 	int i, j, k;
-
-	                        /*builds the aux array */
-	for (i = m + 1; i > l; i--)
+	for (i = m + 1; i > l; i--)  /*builds the aux array */
 		aux[i - 1] = a[i - 1];
 	for (j = m; j < r; j++)
 		aux[r + m - j] = a[j + 1];
-
-	/*sorts the aux array*/
+	                        /*sorts the aux array*/
     if(sortformat == ONE){ /* sorts alphabetically*/
         for (k = l; k <= r; k++)
 		    if(cmpInfo(aux[j],aux[i]))
@@ -768,11 +765,11 @@ void merge(int a[],int aux[],int l, int m, int r,int sortformat){
     }
     else{/*sorts by starting time**/
         for(k = l;k <= r; k++){
-            if(cmpInfoStartingTime(aux[j],(aux[i])))
+            if(cmpStartingTime(aux[j],(aux[i])))
                 a[k] = aux[j--];
-            else if(cmpInfoStartingTime(aux[j],(aux[i])) == false){
+            else if(cmpStartingTime(aux[j],(aux[i])) == false){
                 a[k] = aux[i++];
-            }else if(cmpInfoStartingTime(aux[j],(aux[i])) == THREE){
+            }else if(cmpStartingTime(aux[j],(aux[i])) == THREE){
                 if(cmpInfo(aux[j],aux[i])) /*in a tie situation the tiebreaker
                 is the task's description*/
 			    a[k] = aux[j--];
