@@ -18,12 +18,17 @@
 #define START 1        /*true value for the command line parsing*/
 #define TASKSMAX  10000/*maximum number of tasks*/ 
 #define TASKINFO 50    /*maximum number of characters of a task description*/
-#define ACTIVITYMAX 10 /*maximum number of activities in the system*/
+#define ACTIVITYMAX 13 /*maximum number of activities in the system --> 10
+however, the value of ACTIVITYMAX 13 already takes in account the three 
+standard actvitities */
 #define ACTIVITYINFO 20/*maximum number of characters of an activity description*/
 #define USERMAX 50     /*maximum number of users in the system*/
 #define USERNAME 20    /*maximum number of characters of an user description*/
-#define ONE 1          /*comparison/computation value*/
 #define ZERO 0         /*comparison/computation value*/
+#define ONE 1          /*comparison/computation value*/
+#define TWO 2          /*comparison/computation value*/
+#define ZERO 0         /*comparison/computation value*/
+#define THREE 3        /*computation value*/
 #define STAGE1         "TO DO" /* first stage of an activity*/
 #define STAGE2         "IN PROGRESS" /*second stage of an activity*/
 #define STAGE3         "DONE"        /*last stage of an activity*/
@@ -31,7 +36,7 @@
 #define DURATION       "duration"
 #define SLACK          "slack"
 #define ZEROCHAR       '0'
-#define NUL           '\0'
+#define NUL            '\0'
 
 
 /* Macros used in error handling*/
@@ -144,7 +149,7 @@ int listby_id[TASKSMAX]; /*stores the saved ids*/
 /*  variables*/
 int tsk_counter;        /*counts the number of tasks in the system*/
 int usr_counter;        /*counts the number of users in the system*/
-int act_counter;        /*counts the number of activities in the system*/
+int act_counter;         /*counts the number of activities in the system*/
 int clock;              /*current time in the system*/
 
 /*  Function Prototypes*/
@@ -183,6 +188,12 @@ void merge(Item a[],Item aux[],int l, int m, int r);
 int  main(){
 
     char cmd;
+    act_counter = THREE; /* sets the activity counter to 3*/
+    
+    /*/*  the system already has beforehand three different activites
+    i.e. TO DO (STAGE1), IN PROGRESS (STAGE2) and DONE (STAGE3) */
+    strcpy(activities[ZERO].name,STAGE1);strcpy(activities[ONE].name,STAGE2);
+    strcpy(activities[TWO].name,STAGE3);
 
     while(START){
 
@@ -274,7 +285,7 @@ int isTaskinSystem(int id){
     int i;
 
     for(i = 0; i <= tsk_counter; i++){
-        if(tasks[tsk_counter].id == id-ONE){ /*id starts at one, */
+        if(tasks[i].id == id){ /*id starts at one, */
             return true;                     /*the - ONE removes the offset*/
         }
     }
@@ -296,7 +307,7 @@ int isActivityinSystem(char activity[]){
 /*  verifies if a task already started*/
 int taskAlreadyStarted(int id,char activity[]){
 
-    return(tasks[id - ONE].instant > ZERO && (strcmp(activity,STAGE1) == false)
+    return(tasks[id - ONE].instant > ZERO || (strcmp(activity,STAGE1) == true)
           ); 
 }
 
@@ -374,24 +385,37 @@ void addTaskToSystem(){
 
 void  listTask(){ 
 
-    int c,i,k = ZERO;
+    int c,i,k,savechar;
+    k = ZERO, i = ONE;
+
      /*removes the first white space immediately after the l command */ 
     getchar();            
+     /*saves the character after the whitespace to use later*/  
+    savechar = getchar();
 
-    if(!(isspace(getchar()))){/*verifies if we're dealing with a list tasks by 
+    if(!(isspace(savechar))){/*verifies if we're dealing with a list tasks by 
                             alphabetical order or by order of the given ids*/
+
+        /*converts to the correspondent integer*/                    
+        listby_id[ZERO] = (savechar - ZEROCHAR);
+        printf("%d\n",listby_id[ZERO]);
+
         while((c = getchar())!= '\n' && c != EOF){
             if(!(isspace(c))){ /*checks for characters != whitespace*/
-                listby_id[i++] = c - ZERO;
+                listby_id[i] = c - ZEROCHAR;
+                i++;
                 k++;       
             }
         }
+        
         /*lists tasks by the order of the given ids*/
-        for(i = ZERO; i <= k; i++){
-            printListTask(i);
+      
+        for(i = ZERO; i <= k; i++){ /*funciona yikeesssssss*/
+            printListTask(listby_id[i]-ONE);
         }
     }
     /*SORTING STUFF*/
+    /*not acc working*/
     /*lists tasks by alphabetical order of description*/
     else{
         mergesort(tasks,auxCMDl,ZERO,tsk_counter - ONE);
@@ -504,10 +528,7 @@ void moveTask(){
     char user[USERNAME], activity[ACTIVITYINFO];
 
     scanf("%d %s %[^\n]s",&id,user,activity);
-
-    /*updates the starting time of a given activity*/
-    tasks[id-ONE].instant = clock; 
-
+ 
     if(isTaskinSystem(id) == false){ /*tests for errors*/
         printf("%s\n",TASKFSYSTEM);
     }
@@ -522,14 +543,18 @@ void moveTask(){
     }
     else{
         /*updates the starting time of a given activity*/
-        tasks[id-ONE].instant = clock; 
-
-        duration = tasks[id - ONE].instant - clock;
+        tasks[id-ONE].instant = clock;
+        duration = tasks[id - ONE].instant - clock; 
         slack = duration -  tasks[id - ONE].duration;
-        printf("%s=%d %s=%d\n",DURATION,duration,SLACK,slack);
-
+        /*printf("%d",duration);
+        printf("%d",duration);*/
         strcpy(tasks[id-ONE].user.name,user); 
         strcpy(tasks[id-ONE].activity.name,activity);
+
+        if(taskDone(id)){
+            printf("%s=%d %s=%d\n",DURATION,duration,SLACK,slack);
+
+        } 
     }
 }
 
@@ -551,7 +576,7 @@ void listTaskActvity(){
     char activity[ACTIVITYINFO];
 
     getchar();             
-    scanf("%s",activity);
+    scanf("%[^\n]s",activity);
 
     if(isActivityinSystem(activity)== false){
         printf("%s\n",ACTFSYSTEM);
@@ -598,7 +623,6 @@ void addOrListActivity(){
 
     if(!(isspace(savechar))){/*verifies if we're dealing with a list activities
                              or a create activity command*/
-
         /*saves the first non whitespace character to an auxiliary array*/
         activity[0] = savechar;
 	    while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
