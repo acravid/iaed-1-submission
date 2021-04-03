@@ -173,10 +173,16 @@ int cmp(int,int);
 /*  Sorting*/
 
 typedef Tasks_t Item;
-Item auxCMDd[TASKSMAX];         /*auxiliary array used in sorting,command d*/
+/*auxiliary array used in sorting,command l*/
+int auxCMDL[TASKSMAX + ONE];        
+int aux[TASKSMAX + ONE];
 int auxCMDl[TASKSMAX];         /*auxiliary array used in sorting,command l*/
-void mergesort(int a[],int aux[], int l, int r);
-void merge(int a[],int aux[],int l, int m, int r); 
+
+/*sortformat = one, is associated  with sort by alphabetical order 
+ of description*/
+/*sortformat = zero, is associated with sort by starting time*/
+void mergesort(int a[],int aux[], int l, int r,int sortformat);
+void merge(int a[],int aux[],int l, int m, int r,int sortformat); 
 
 
 
@@ -313,12 +319,10 @@ int taskDone(int id){
            );
 }
 
+/* */
 int cmp(int i, int j){
-    int cmp;
-    cmp = strcmp(tasks[i].info,tasks[j].info);
-    return cmp > 0;
 
-
+    return ((strcmp(tasks[i].info,tasks[j].info) < ZERO) ? true: false);
 }
 /* prints list task message*/
 void printListTask(int i){
@@ -429,17 +433,16 @@ void  listTask(){
         }
     }
     /*SORTING STUFF*/
-    /*not acc working*/
     /*lists tasks by alphabetical order of description*/
     else{
-
-        for(i = ZERO; i < TASKSMAX; i++){
-            indextask[i] = i;
+        for(i = ZERO; i < tsk_counter; i++){
+            auxCMDL[i] = i; /*cria vetor de indices das tarefas*/
         }
-        mergesort(indextask,auxCMDl,ZERO,tsk_counter - ONE);
 
-        for(i = 0; i < tsk_counter; i++){
-            printListTask(indextask[i]);
+        mergesort(auxCMDL,aux,ZERO,tsk_counter - ONE,ONE);
+
+        for(i = ZERO; i < tsk_counter; i++){
+            printListTask(auxCMDL[i]);
         }
     }    
 } 
@@ -590,7 +593,7 @@ void moveTask(){
 
 void listTaskActvity(){     
 
-    int i,k = 0 ;
+    /*int i,k = 0 ;*/
     char activity[ACTIVITYINFO];
 
     getchar();             
@@ -600,17 +603,7 @@ void listTaskActvity(){
         printf("%s\n",ACTFSYSTEM);
     }
     else{
-
-        /*SORTING STUFF*/
-        for(i = 0; i < tsk_counter; i++){ 
-        /*strcmp returns zero if both strings are equal
-        checks for same activity in tasks*/                                 
-            if(strcmp(tasks[i].activity.name,activity)== false){ 
-                auxCMDd[i].id = tasks[i].id; /*saves the id to an auxiliary array*/
-                k++;  /*counts the number of tasks associated with the given 
-                         activity*/
-            }
-        }
+        printf("to do");
     }
 
 
@@ -685,18 +678,18 @@ void addOrListActivity(){
  * 
  */
 
-void mergesort(int a[],int aux[],int l, int r){
+void mergesort(int a[],int aux[],int l, int r,int sortformat){
 
 	int m = (r + l) / 2;
 	if (r <= l) return;
 
-	mergesort(a,aux, l, m);     /* sorts the left part of the array */
-	mergesort(a,aux, m + 1, r); /* sorts the right part of the array */
-	merge(a,aux, l, m, r);      /* merges both sorted arrays into one sorted 
+	mergesort(a,aux, l, m,sortformat);     /* sorts the left part of the array */
+	mergesort(a,aux, m + 1, r,sortformat); /* sorts the right part of the array */
+	merge(a,aux, l, m, r,sortformat);      /* merges both sorted arrays into one sorted 
                                 array */
 }
 
-void merge(int a[],int aux[],int l, int m, int r){
+void merge(int a[],int aux[],int l, int m, int r,int sortformat){
 
 	
 	int i, j, k;
@@ -708,10 +701,16 @@ void merge(int a[],int aux[],int l, int m, int r){
 		aux[r + m - j] = a[j + 1];
 
 	/*sorts the aux array*/
-	for (k = l; k <= r; k++)
-		if(strcmp(tasks[aux[i]].activity.name,tasks[aux[j]].activity.name) < ZERO)
-			a[k] = aux[j--];
-		else
-			a[k] = aux[i++];
+    if(sortformat == ONE){
+        for (k = l; k <= r; k++)
+		    if(cmp(aux[j],aux[i]))
+			    a[k] = aux[j--];
+		    else
+			    a[k] = aux[i++];
+
+    }
+    else{
+        printf("to work ");
+    }
 }
 
