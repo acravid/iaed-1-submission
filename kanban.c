@@ -55,11 +55,6 @@ standard actvitities */
 #define TASKTSTARTED   "task already started"
 #define USERINSYSTEM   "user already exists"
 
-/*  Macros to make the sorting algorithm more abstract*/
-#define key(A) (A)
-#define less(A,B) (key(A) < key(B))
-
-
 /* booleans definiton*/
 
 typedef enum {false = ZERO,true = !false} boolean;
@@ -144,7 +139,7 @@ Tasks_t tasks[TASKSMAX];
 
 
 int listby_id[TASKSMAX]; /*stores the saved ids*/
-
+int indextask[TASKSMAX];
 
 /*  variables*/
 int tsk_counter;        /*counts the number of tasks in the system*/
@@ -173,15 +168,15 @@ int taskDone(int id);
 int isActivityinSystem(char name[]); 
 int isTaskInfoDuplicated(char s[]);  
 int isActivityInfoDuplicated(char s[]);
-int stringHigherLower(char s[],char ss[]);
+int cmp(int,int);
 
 /*  Sorting*/
 
 typedef Tasks_t Item;
 Item auxCMDd[TASKSMAX];         /*auxiliary array used in sorting,command d*/
-Item auxCMDl[TASKSMAX];         /*auxiliary array used in sorting,command l*/
-void mergesort(Item a[],Item aux[], int l, int r);
-void merge(Item a[],Item aux[],int l, int m, int r); 
+int auxCMDl[TASKSMAX];         /*auxiliary array used in sorting,command l*/
+void mergesort(int a[],int aux[], int l, int r);
+void merge(int a[],int aux[],int l, int m, int r); 
 
 
 
@@ -284,8 +279,8 @@ int isTaskinSystem(int id){
 
     int i;
 
-    for(i = 0; i <= tsk_counter; i++){
-        if(tasks[i].id == id){ /*id starts at one, */
+    for(i = ONE; i <= tsk_counter; i++){
+        if(tasks[i - ONE].id == id){ /*id starts at one, */
             return true;                     /*the - ONE removes the offset*/
         }
     }
@@ -317,11 +312,22 @@ int taskDone(int id){
     return((strcmp(tasks[id - ONE].activity.name,STAGE3) == false)
            );
 }
+
+int cmp(int i, int j){
+    int cmp;
+    cmp = strcmp(tasks[i].info,tasks[j].info);
+    return cmp > 0;
+
+
+}
 /* prints list task message*/
 void printListTask(int i){
     printf("%d %s #%d %s\n",tasks[i].id,tasks[i].activity.name,
     tasks[i].duration,tasks[i].info);
 }
+
+
+
 /*---------------------------------------------------------------------------*/
 
 /*
@@ -396,32 +402,44 @@ void  listTask(){
     if(!(isspace(savechar))){/*verifies if we're dealing with a list tasks by 
                             alphabetical order or by order of the given ids*/
 
-        /*converts to the correspondent integer*/                    
-        listby_id[ZERO] = (savechar - ZEROCHAR);
-        printf("%d\n",listby_id[ZERO]);
-
+  /*converts to the correspondent integer and checks if task in the system*/                    
+        if(isTaskinSystem((savechar - ZEROCHAR)) == true){
+             listby_id[ZERO] = (savechar - ZEROCHAR);
+              /*lists tasks by the order of the given ids*/
+             printListTask(listby_id[ZERO]-ONE);
+             k++;
+        }
+        else{
+            printf("%s\n",TASKFSYSTEM);
+            i = ZERO;
+        }
         while((c = getchar())!= '\n' && c != EOF){
             if(!(isspace(c))){ /*checks for characters != whitespace*/
-                listby_id[i] = c - ZEROCHAR;
-                i++;
-                k++;       
+                if(isTaskinSystem((c - ZEROCHAR)) == true){
+                    listby_id[i] = c - ZEROCHAR;
+                /*lists tasks by the order of the given ids*/
+                    printListTask(listby_id[i]-ONE);
+                    i++;
+                    k++;      
+                }
+                else{
+                    printf("%s\n",TASKFSYSTEM);
+                }  
             }
-        }
-        
-        /*lists tasks by the order of the given ids*/
-      
-        for(i = ZERO; i <= k; i++){ /*funciona yikeesssssss*/
-            printListTask(listby_id[i]-ONE);
         }
     }
     /*SORTING STUFF*/
     /*not acc working*/
     /*lists tasks by alphabetical order of description*/
     else{
-        mergesort(tasks,auxCMDl,ZERO,tsk_counter - ONE);
+
+        for(i = ZERO; i < TASKSMAX; i++){
+            indextask[i] = i;
+        }
+        mergesort(indextask,auxCMDl,ZERO,tsk_counter - ONE);
 
         for(i = 0; i < tsk_counter; i++){
-            printListTask(i);
+            printListTask(indextask[i]);
         }
     }    
 } 
@@ -667,7 +685,7 @@ void addOrListActivity(){
  * 
  */
 
-void mergesort(Item a[],Item aux[],int l, int r){
+void mergesort(int a[],int aux[],int l, int r){
 
 	int m = (r + l) / 2;
 	if (r <= l) return;
@@ -678,7 +696,7 @@ void mergesort(Item a[],Item aux[],int l, int r){
                                 array */
 }
 
-void merge(Item a[],Item aux[],int l, int m, int r){
+void merge(int a[],int aux[],int l, int m, int r){
 
 	
 	int i, j, k;
@@ -691,7 +709,7 @@ void merge(Item a[],Item aux[],int l, int m, int r){
 
 	/*sorts the aux array*/
 	for (k = l; k <= r; k++)
-		if(strcmp(aux[i].activity.name,aux[j].activity.name) > ZERO)
+		if(strcmp(tasks[aux[i]].activity.name,tasks[aux[j]].activity.name) < ZERO)
 			a[k] = aux[j--];
 		else
 			a[k] = aux[i++];
