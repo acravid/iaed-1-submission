@@ -173,7 +173,7 @@ void createTask(int duration , char info[]);
 void createUser(char user[]);
 void createUserValid(char user[]);
 
-int cmp(int,int);
+int cmpInfo(int,int);
 
 /*  Sorting*/
 
@@ -192,6 +192,8 @@ void merge(int a[],int aux[],int l, int m, int r,int sortformat);
  * state = ONE, is associated with the command d output format */
 void printSortAlphabetical(int state);
 void printListTask(int i);
+int cmpInfo(int,int);
+int cmpStartingTime(int,int);
 
 int  main(){
 
@@ -253,7 +255,7 @@ int isTaskInfoDuplicated(char s[]){
     int i;
     
     for(i = 0; i < tsk_counter;i++){
-        if(strcmp(users[i].name,s) == false){
+        if(strcmpInfo(users[i].name,s) == false){
             return true;
         }
     }
@@ -266,7 +268,7 @@ int isActivityInfoDuplicated(char s[]){
     int i;
     
     for(i = 0; i < act_counter;i++){
-        if(strcmp(activities[i].name,s) == false){
+        if(strcmpInfo(activities[i].name,s) == false){
             return true;
         }
     }
@@ -280,7 +282,7 @@ int isUserinSystem(char name[]){
     int i;
 
     for(i = 0; i < usr_counter; i++){
-        if(strcmp(users[i].name,name) == false){
+        if(strcmpInfo(users[i].name,name) == false){
             return true;
         }
     }
@@ -306,7 +308,7 @@ int isActivityinSystem(char activity[]){
     int i;
 
     for(i = 0; i < act_counter; i++){
-        if(strcmp(activities[i].name,activity) == false){
+        if(strcmpInfo(activities[i].name,activity) == false){
             return true;
         }
     }
@@ -315,21 +317,31 @@ int isActivityinSystem(char activity[]){
 /*  verifies if a task already started*/
 int taskAlreadyStarted(int id,char activity[]){
 
-    return(tasks[id - ONE].instant > ZERO || (strcmp(activity,STAGE1) == true)
+    return(tasks[id - ONE].instant > ZERO || (strcmpInfo(activity,STAGE1) == true)
           ); 
 }
 
 /*  verifies if a task has reached its last stage, DONE*/
 int taskDone(int id){
-
-    return((strcmp(tasks[id - ONE].activity.name,STAGE3) == false)
-           );
+    return((strcmpInfo(tasks[id - ONE].activity.name,STAGE3) == false));
 }
 
 /* */
-int cmp(int i, int j){
+int cmpInfo(int i, int j){
+    return ((strcmpInfo(tasks[i].info,tasks[j].info) < ZERO) ? true: false);
+}
 
-    return ((strcmp(tasks[i].info,tasks[j].info) < ZERO) ? true: false);
+int cmpStartingTime(int i,int j){
+    
+    if(tasks[i].instant < tasks[j].instant){
+        return true;
+    }
+    else if( tasks[i].instant > tasks[j].instant){
+        return false;
+    }
+    else{
+        return THREE;
+    }  
 }
 /* prints list task message, command l*/
 void printListTask(int i){
@@ -394,6 +406,7 @@ void createUser(char user[]){
     strcpy(users[usr_counter].name,user); 
     usr_counter++;      /*increases the number of users in the system*/
 }
+
 /*  checks conditions associated with command u */
 void createUserValid(char user[]){
 
@@ -654,7 +667,7 @@ void listTaskActvity(){
         printf("%s\n",ACTFSYSTEM);
     }
     else{
-        if(strcmp(STAGE1,activity)== false){
+        if(strcmpInfo(STAGE1,activity)== false){
 
 
         }
@@ -746,16 +759,27 @@ void merge(int a[],int aux[],int l, int m, int r,int sortformat){
 		aux[r + m - j] = a[j + 1];
 
 	/*sorts the aux array*/
-    if(sortformat == ONE){
+    if(sortformat == ONE){ /* sorts alphabetically*/
         for (k = l; k <= r; k++)
-		    if(cmp(aux[j],aux[i]))
+		    if(cmpInfo(aux[j],aux[i]))
 			    a[k] = aux[j--];
 		    else
 			    a[k] = aux[i++];
-
     }
-    else{
-        ;
+    else{/*sorts by starting time**/
+        for(k = l;k <= r; k++){
+            if(cmpInfoStartingTime(aux[j],(aux[i])))
+                a[k] = aux[j--];
+            else if(cmpInfoStartingTime(aux[j],(aux[i])) == false){
+                a[k] = aux[i++];
+            }else if(cmpInfoStartingTime(aux[j],(aux[i])) == THREE){
+                if(cmpInfo(aux[j],aux[i])) /*in a tie situation the tiebreaker
+                is the task's description*/
+			    a[k] = aux[j--];
+		        else
+			    a[k] = aux[i++];
+            }
+        }
     }
 }
 
