@@ -139,7 +139,6 @@ Tasks_t tasks[TASKSMAX];
 
 
 int listby_id[TASKSMAX]; /*stores the saved ids*/
-int indextask[TASKSMAX];
 
 /*  variables*/
 int tsk_counter;        /*counts the number of tasks in the system*/
@@ -173,11 +172,9 @@ void createTask(int duration , char info[]);
 void createUser(char user[]);
 void createUserValid(char user[]);
 
-int cmpInfo(int,int);
 
 /*  Sorting*/
 
-typedef Tasks_t Item;
 /*auxiliary array used in sorting,command l*/
 int auxCMDL[TASKSMAX + ONE];        
 int aux[TASKSMAX + ONE];
@@ -757,11 +754,12 @@ void merge(int a[],int aux[],int l, int m, int r,int sortformat){
 		aux[r + m - j] = a[j + 1];
 	                        /*sorts the aux array*/
     if(sortformat == ONE){ /* sorts alphabetically*/
-        for (k = l; k <= r; k++)
-		    if(cmpInfo(aux[j],aux[i]))
+        for (k = l; k <= r; k++){
+            if(cmpInfo(aux[j],aux[i]))
 			    a[k] = aux[j--];
 		    else
 			    a[k] = aux[i++];
+        }
     }
     else{/*sorts by starting time**/
         for(k = l;k <= r; k++){
@@ -770,11 +768,10 @@ void merge(int a[],int aux[],int l, int m, int r,int sortformat){
             else if(cmpStartingTime(aux[j],(aux[i])) == false){
                 a[k] = aux[i++];
             }else if(cmpStartingTime(aux[j],(aux[i])) == THREE){
-                if(cmpInfo(aux[j],aux[i])) /*in a tie situation the tiebreaker
-                is the task's description*/
-			    a[k] = aux[j--];
+                if(cmpInfo(aux[j],aux[i])) /*in a tie situation the tiebreaker is the task's description*/
+			        a[k] = aux[j--];
 		        else
-			    a[k] = aux[i++];
+			        a[k] = aux[i++];
             }
         }
     }
