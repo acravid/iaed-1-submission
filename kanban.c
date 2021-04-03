@@ -168,6 +168,8 @@ int taskDone(int id);
 int isActivityinSystem(char name[]); 
 int isTaskInfoDuplicated(char s[]);  
 int isActivityInfoDuplicated(char s[]);
+void listTasksValid(int c,int i,int k);
+void createTask(int duration , char info[]);
 int cmp(int,int);
 
 /*  Sorting*/
@@ -183,8 +185,10 @@ int auxCMDl[TASKSMAX];         /*auxiliary array used in sorting,command l*/
 /*sortformat = zero, is associated with sort by starting time*/
 void mergesort(int a[],int aux[], int l, int r,int sortformat);
 void merge(int a[],int aux[],int l, int m, int r,int sortformat); 
-
-
+/* state = ZERO, is associated with the command l output format *
+ * state = ONE, is associated with the command d output format */
+void printSortAlphabetical(int state);
+void printListTask(int i);
 
 int  main(){
 
@@ -324,14 +328,62 @@ int cmp(int i, int j){
 
     return ((strcmp(tasks[i].info,tasks[j].info) < ZERO) ? true: false);
 }
-/* prints list task message*/
+/* prints list task message, command l*/
 void printListTask(int i){
     printf("%d %s #%d %s\n",tasks[i].id,tasks[i].activity.name,
     tasks[i].duration,tasks[i].info);
 }
 
+/* prints task in activity message, command d*/
+void printTaskActivity(int i){
 
+    printf("%d %d %s",tasks[i].id,tasks[i].instant,tasks[i].activity.name);
 
+}
+
+/* prints task in alphabetical order*/
+void printSortAlphabetical(int state){
+    int i;
+
+    for(i = ZERO; i < tsk_counter; i++){
+            auxCMDL[i] = i; /*add values to an array of tasks indexes*/
+    }
+    mergesort(auxCMDL,aux,ZERO,tsk_counter - ONE,ONE);
+    for(i = ZERO; i < tsk_counter; i++){
+        if(state == ZERO) /*output format: command l*/
+            printListTask(auxCMDL[i]);
+        else
+            printTaskActivity(auxCMDL[i]);/*output format: command d*/
+    }
+}
+
+/* checks conditions associated with command d*/
+void listTasksValid(int c, int i,int k){
+    if(!(isspace(c))){ /*checks for characters != whitespace*/
+        if(isTaskinSystem((c - ZEROCHAR)) == true){
+            listby_id[i] = c - ZEROCHAR;
+            /*lists tasks by order of the given ids*/
+            printListTask(listby_id[i]-ONE);
+            i++;
+            k++;      
+            }
+            else{
+                printf("%s\n",TASKFSYSTEM);
+            }  
+    }
+}
+
+/*  creates a new task*/
+void createTask(int duration , char info[]){
+
+    tasks[tsk_counter].duration = duration;
+    tasks[tsk_counter].id = tsk_counter + ONE;
+    tasks[tsk_counter].instant = ZERO;
+    strcpy(tasks[tsk_counter].info,info);
+    strcpy(tasks[tsk_counter].activity.name,STAGE1);
+    printf("%s %d\n",TASK,tasks[tsk_counter].id);
+    tsk_counter++;
+}
 /*---------------------------------------------------------------------------*/
 
 /*
@@ -357,8 +409,6 @@ void addTaskToSystem(){
     scanf("%[^\n]s",info); /*the description cannot start with a whitespace*/
   
     if(!(info[0] == NUL) && nonNegativeIntChecker(duration)){
-    
-
         if(tsk_counter > TASKSMAX){
             printf("%s\n",MAXTASKS);
         }
@@ -367,13 +417,7 @@ void addTaskToSystem(){
         }
         else{
             /*creates a new task */
-            tasks[tsk_counter].duration = duration;
-            tasks[tsk_counter].id = tsk_counter + ONE;
-            tasks[tsk_counter].instant = ZERO;
-            strcpy(tasks[tsk_counter].info,info);
-            strcpy(tasks[tsk_counter].activity.name,STAGE1);
-            printf("%s %d\n",TASK,tasks[tsk_counter].id);
-            tsk_counter++;
+            createTask(duration,info);
         }       
     }
     else{
@@ -392,7 +436,6 @@ void addTaskToSystem(){
  *          
  *  command: l
  */
-
 void  listTask(){ 
 
     int c,i,k,savechar;
@@ -402,14 +445,13 @@ void  listTask(){
     getchar();            
      /*saves the character after the whitespace to use later*/  
     savechar = getchar();
-
     if(!(isspace(savechar))){/*verifies if we're dealing with a list tasks by 
                             alphabetical order or by order of the given ids*/
 
   /*converts to the correspondent integer and checks if task in the system*/                    
         if(isTaskinSystem((savechar - ZEROCHAR)) == true){
              listby_id[ZERO] = (savechar - ZEROCHAR);
-              /*lists tasks by the order of the given ids*/
+              /*lists tasks by order of the given ids*/
              printListTask(listby_id[ZERO]-ONE);
              k++;
         }
@@ -418,32 +460,12 @@ void  listTask(){
             i = ZERO;
         }
         while((c = getchar())!= '\n' && c != EOF){
-            if(!(isspace(c))){ /*checks for characters != whitespace*/
-                if(isTaskinSystem((c - ZEROCHAR)) == true){
-                    listby_id[i] = c - ZEROCHAR;
-                /*lists tasks by the order of the given ids*/
-                    printListTask(listby_id[i]-ONE);
-                    i++;
-                    k++;      
-                }
-                else{
-                    printf("%s\n",TASKFSYSTEM);
-                }  
-            }
+            listTasksValid(c,i,k);
         }
     }
-    /*SORTING STUFF*/
     /*lists tasks by alphabetical order of description*/
     else{
-        for(i = ZERO; i < tsk_counter; i++){
-            auxCMDL[i] = i; /*cria vetor de indices das tarefas*/
-        }
-
-        mergesort(auxCMDL,aux,ZERO,tsk_counter - ONE,ONE);
-
-        for(i = ZERO; i < tsk_counter; i++){
-            printListTask(auxCMDL[i]);
-        }
+        printSortAlphabetical(ZERO);
     }    
 } 
 
@@ -598,12 +620,16 @@ void listTaskActvity(){
 
     getchar();             
     scanf("%[^\n]s",activity);
+    printf("%s\n",activity);
 
     if(isActivityinSystem(activity)== false){
         printf("%s\n",ACTFSYSTEM);
     }
     else{
-        printf("to do");
+        if(strcmp(STAGE1,activity)== false){
+
+
+        }
     }
 
 
@@ -710,7 +736,7 @@ void merge(int a[],int aux[],int l, int m, int r,int sortformat){
 
     }
     else{
-        printf("to work ");
+        ;
     }
 }
 
