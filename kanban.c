@@ -170,6 +170,9 @@ int isTaskInfoDuplicated(char s[]);
 int isActivityInfoDuplicated(char s[]);
 void listTasksValid(int c,int i,int k);
 void createTask(int duration , char info[]);
+void createUser(char user[]);
+void createUserValid(char user[]);
+
 int cmp(int,int);
 
 /*  Sorting*/
@@ -180,9 +183,9 @@ int auxCMDL[TASKSMAX + ONE];
 int aux[TASKSMAX + ONE];
 int auxCMDl[TASKSMAX];         /*auxiliary array used in sorting,command l*/
 
-/*sortformat = one, is associated  with sort by alphabetical order 
+/*sortformat = ONE, is associated  with sort by alphabetical order 
  of description*/
-/*sortformat = zero, is associated with sort by starting time*/
+/*sortformat = ZERO, is associated with sort by starting time*/
 void mergesort(int a[],int aux[], int l, int r,int sortformat);
 void merge(int a[],int aux[],int l, int m, int r,int sortformat); 
 /* state = ZERO, is associated with the command l output format *
@@ -384,6 +387,40 @@ void createTask(int duration , char info[]){
     printf("%s %d\n",TASK,tasks[tsk_counter].id);
     tsk_counter++;
 }
+
+/* creates a new user*/
+void createUser(char user[]){
+
+    strcpy(users[usr_counter].name,user); 
+    usr_counter++;      /*increases the number of users in the system*/
+}
+/*  checks conditions associated with command u */
+void createUserValid(char user[]){
+
+    if(isUserinSystem(user)){  /*tests for errors*/
+            printf("%s\n",USERINSYSTEM);
+    }
+    else if(usr_counter > USERMAX){
+        printf("%s\n",MAXUSERS);
+    }
+}
+
+/*  tests for errors associated with command a or
+    creates a new activity*/
+void testCreateActivity( char activity[]){
+
+    if(isActivityInfoDuplicated(activity)){
+        printf("%s\n",ACTDUPLICATED);
+    }
+    else if(act_counter > ACTIVITYMAX ){
+        printf("%s\n",MAXACT);
+    }
+    else{             /*creates a new activity*/
+        strcpy(activities[act_counter].name,activity);
+        act_counter++;/*increases the number of activities in the system*/
+    }
+
+}
 /*---------------------------------------------------------------------------*/
 
 /*
@@ -529,19 +566,10 @@ void  addUserListUser(){
             user[i++] = c;
         }
         user[i] = NUL;
-        if(isUserinSystem(user)){  /*tests for errors*/
-            printf("%s\n",USERINSYSTEM);
-        }
-        else if(usr_counter > USERMAX){
-            printf("%s\n",MAXUSERS);
-        }
-        else{                      /*creates a new user */
-        strcpy(users[usr_counter].name,user); 
-        usr_counter++;      /*increases the number of users in the system*/
-        }
+        createUserValid(user);/*tests for errors*/
+        createUser(user);/*creates a new user*/
     }
-    else{                  /*lists all users in the system by insertion order*/
-
+    else{   /*lists all users in the system by insertion order*/
             for(j = 0; j < usr_counter; j++){
                 printf("%s\n",users[j].name);
         }
@@ -670,16 +698,7 @@ void addOrListActivity(){
             activity[i++] = c; 
         }
         activity[i] = NUL;
-        if(isActivityInfoDuplicated(activity)){
-            printf("%s\n",ACTDUPLICATED);
-        }
-        else if(act_counter > ACTIVITYMAX ){
-            printf("%s\n",MAXACT);
-        }
-        else{             /*creates a new activity*/
-            strcpy(activities[act_counter].name,activity);
-            act_counter++;/*increases the number of activities in the system*/
-        }
+        testCreateActivity(activity);
     }
     else{             /*lists all activities in the system by insertion order*/
             for(j = 0; j < act_counter; j++){
