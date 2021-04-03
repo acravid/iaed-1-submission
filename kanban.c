@@ -747,18 +747,18 @@ void mergesort(int a[],int aux[],int l, int r,int sortformat){
 void merge(int a[],int aux[],int l, int m, int r,int sortformat){
 
 	
-	int i, j, k;
-	for (i = m + 1; i > l; i--)  /*builds the aux array */
-		aux[i - 1] = a[i - 1];
-	for (j = m; j < r; j++)
-		aux[r + m - j] = a[j + 1];
+    int i, j, k;
+    for (i = m + 1; i > l; i--)  /*builds the aux array */
+	aux[i - 1] = a[i - 1];
+    for (j = m; j < r; j++)
+	aux[r + m - j] = a[j + 1];
 	                        /*sorts the aux array*/
     if(sortformat == ONE){ /* sorts alphabetically*/
         for (k = l; k <= r; k++){
             if(cmpInfo(aux[j],aux[i]))
-			    a[k] = aux[j--];
-		    else
-			    a[k] = aux[i++];
+	    	 a[k] = aux[j--];
+	     else
+	  	 a[k] = aux[i++];
         }
     }
     else{/*sorts by starting time**/
