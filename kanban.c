@@ -770,7 +770,6 @@ void addOrListActivity(){
 
 /*  sorting*/
 
-
 /*
  * algorithm of choice: mergesort, top-down mergesort
  * time complexity: N log N 
