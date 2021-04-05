@@ -1,7 +1,7 @@
 /*
  *
  *File:        kanban.c
- *Author:      Allan Donizette Cravid Fernades 97281
+ *Author:      Allan Donizette Cravid Fernandes 97281
  *Description: a schedulling system for tasks management
  *  
  */
