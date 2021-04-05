@@ -74,11 +74,7 @@ typedef enum {false = ZERO,true = !false} boolean;
 typedef struct{
 
     char name[ACTIVITYINFO];
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> e514c13632ac85bf5fcd4de0e59f1abb7ac0ed47
 }Activity_t;
 
 
