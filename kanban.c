@@ -477,23 +477,26 @@ void testMoveTask(int id,char user[], char activity[]){
     else if((isActivityinSystem(activity) == false)){
         printf("%s\n",ACTFSYSTEM);return;
     }
-    if(taskDone(activity)){
+    if(tasks[id-ONE].instant == ZERO){
+            /*updates the starting time of a given activity*/
+            tasks[id-ONE].instant = clock;
+            strcpy(tasks[id-ONE].user.name,user); 
+            strcpy(tasks[id-ONE].activity.name,activity);
+            duration = clock - tasks[id - ONE].instant;
+            slack = duration -  tasks[id - ONE].duration;
+            if(taskDone(activity)){
+                printf("%s=%d %s=%d\n",DURATION,duration,SLACK,slack);
+            }
+    }
+    else if(taskDone(activity)){
         duration = clock - tasks[id - ONE].instant;
         slack = duration -  tasks[id - ONE].duration; 
         printf("%s=%d %s=%d\n",DURATION,duration,SLACK,slack);
         strcpy(tasks[id-ONE].activity.name,activity);   
     }
     else{
-        if(tasks[id-ONE].instant == ZERO){
-            /*updates the starting time of a given activity*/
-            tasks[id-ONE].instant = clock;
-            strcpy(tasks[id-ONE].user.name,user); 
+          strcpy(tasks[id-ONE].user.name,user);
             strcpy(tasks[id-ONE].activity.name,activity);
-        }
-        else{
-            strcpy(tasks[id-ONE].user.name,user);
-            strcpy(tasks[id-ONE].activity.name,activity);
-        }
     }
 }
 
