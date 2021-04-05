@@ -74,8 +74,6 @@ typedef enum {false = ZERO,true = !false} boolean;
 typedef struct{
 
     char name[ACTIVITYINFO];
-    char stage[ACTIVITYINFO];
-    
 
 }Activity_t;
 
@@ -200,7 +198,7 @@ int  main(){
     char cmd;
     act_counter = THREE; /* sets the activity counter to 3*/
     
-    /*/*  the system already has beforehand three different activites
+    /*the system already has beforehand three different activites
     i.e. TO DO (STAGE1), IN PROGRESS (STAGE2) and DONE (STAGE3) */
     strcpy(activities[ZERO].name,STAGE1);strcpy(activities[ONE].name,STAGE2);
     strcpy(activities[TWO].name,STAGE3);
@@ -318,7 +316,6 @@ int isActivityinSystem(char activity[]){
     return false;
 }
 
-/*  verifies if a task already started*/
 /*  verifies if a task already started*/
 int taskAlreadyStarted(int id,char activity[]){
 
@@ -484,7 +481,7 @@ void testMoveTask(int id,char user[], char activity[]){
             strcpy(tasks[id-ONE].activity.name,activity);
             duration = clock - tasks[id - ONE].instant;
             slack = duration -  tasks[id - ONE].duration;
-            if(taskDone(activity)){
+            if(taskDone(activity)){ 
                 printf("%s=%d %s=%d\n",DURATION,duration,SLACK,slack);
             }
     }
@@ -495,8 +492,8 @@ void testMoveTask(int id,char user[], char activity[]){
         strcpy(tasks[id-ONE].activity.name,activity);   
     }
     else{
-          strcpy(tasks[id-ONE].user.name,user);
-            strcpy(tasks[id-ONE].activity.name,activity);
+        strcpy(tasks[id-ONE].user.name,user);
+        strcpy(tasks[id-ONE].activity.name,activity);
     }
 }
 
@@ -799,7 +796,7 @@ void merge(int a[],int aux[],int l, int m, int r,int sortformat){
 	    aux[i - 1] = a[i - 1];
     for (j = m; j < r; j++)
 	    aux[r + m - j] = a[j + 1];
-	                        /*sorts the aux array*/
+	                       /*sorts the aux array*/
     if(sortformat == ONE){ /* sorts alphabetically*/
         for (k = l; k <= r; k++){
             if(cmpInfo(aux[j],aux[i]))
