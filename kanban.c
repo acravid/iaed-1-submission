@@ -21,7 +21,7 @@
 #define ACTIVITYMAX 13 /*maximum number of activities in the system --> 10
 however, the value of ACTIVITYMAX 13 already takes in account the three 
 standard actvitities */
-#define ACTIVITYINFO 20/*maximum number of characters of an activity description*/
+#define ACTIVITYINFO 21/*maximum number of characters of an activity description*/
 #define USERMAX 50     /*maximum number of users in the system*/
 #define USERNAME 20    /*maximum number of characters of an user description*/
 #define ZERO 0         /*comparison/computation value*/
@@ -29,7 +29,7 @@ standard actvitities */
 #define TWO 2          /*comparison/computation value*/
 #define ZERO 0         /*comparison/computation value*/
 #define THREE 3        /*computation value*/
-#define STAGE1         "TO DO" /* first stage of an activity*/
+#define STAGE1         "TO DO"       /* first stage of an activity*/
 #define STAGE2         "IN PROGRESS" /*second stage of an activity*/
 #define STAGE3         "DONE"        /*last stage of an activity*/
 #define TASK           "task"
@@ -37,7 +37,7 @@ standard actvitities */
 #define SLACK          "slack"
 #define ZEROCHAR       '0'
 #define NUL            '\0'
-
+#define NLINE          '\n'
 
 /* Macros used in error handling*/
 #define MAXTASKS       "too many tasks"
@@ -74,6 +74,7 @@ typedef enum {false = ZERO,true = !false} boolean;
 typedef struct{
 
     char name[ACTIVITYINFO];
+    char stage[ACTIVITYINFO];
     
 
 }Activity_t;
@@ -138,12 +139,13 @@ Activity_t activities[ACTIVITYMAX];
 Tasks_t tasks[TASKSMAX];
 
 
-int listby_id[TASKSMAX]; /*stores the saved ids*/
+int listby_id[TASKSMAX];     /*stores the saved ids,command d*/
+int listby_idCMDd[TASKSMAX]; /*stores the saved ids, command a*/
 
 /*  variables*/
 int tsk_counter;        /*counts the number of tasks in the system*/
 int usr_counter;        /*counts the number of users in the system*/
-int act_counter;         /*counts the number of activities in the system*/
+int act_counter;        /*counts the number of activities in the system*/
 int clock;              /*current time in the system*/
 
 /*  Function Prototypes*/
@@ -163,31 +165,32 @@ int isTaskinSystem(int id);
 int nonNegativeIntChecker(int time); 
 int isUserinSystem(char name[]);
 int taskAlreadyStarted(int id,char activity[]);
-int taskDone(int id);
+int taskDone(char activity[]);
 int isActivityinSystem(char name[]); 
 int isTaskInfoDuplicated(char s[]);  
 int isActivityInfoDuplicated(char s[]);
+int testActivityLower(char activity[]);
 void listTasksValid(int c,int i,int k);
 void createTask(int duration , char info[]);
 void createUser(char user[]);
 void createUserValid(char user[]);
-
+void testMoveTask(int id,char user[], char activity[]);
+void processActivity(char activity[],int counter);
+void testCreateActivity(char activity[]);
 
 /*  Sorting*/
 
-/*auxiliary array used in sorting,command l*/
-int auxCMDL[TASKSMAX + ONE];        
+/*auxiliary arrays used in sorting,command l and d*/
+int auxCMD[TASKSMAX + ONE];        
 int aux[TASKSMAX + ONE];
-int auxCMDl[TASKSMAX];         /*auxiliary array used in sorting,command l*/
+      
 
 /*sortformat = ONE, is associated  with sort by alphabetical order 
  of description*/
 /*sortformat = ZERO, is associated with sort by starting time*/
 void mergesort(int a[],int aux[], int l, int r,int sortformat);
 void merge(int a[],int aux[],int l, int m, int r,int sortformat); 
-/* state = ZERO, is associated with the command l output format *
- * state = ONE, is associated with the command d output format */
-void printSortAlphabetical(int state);
+void printSortAlphabetical();
 void printListTask(int i);
 int cmpInfo(int,int);
 int cmpStartingTime(int,int);
@@ -234,6 +237,9 @@ int  main(){
     return EXIT_FAILURE;
 }
 
+
+
+
 /*---------------------------------------------------------------------------*/
 
 /* Auxiliary Functions */
@@ -264,7 +270,7 @@ int isActivityInfoDuplicated(char s[]){
 
     int i;
     
-    for(i = 0; i < act_counter;i++){
+    for(i = THREE; i < act_counter;i++){
         if(strcmp(activities[i].name,s) == false){
             return true;
         }
@@ -311,23 +317,41 @@ int isActivityinSystem(char activity[]){
     }
     return false;
 }
+
+/*  verifies if a task already started*/
 /*  verifies if a task already started*/
 int taskAlreadyStarted(int id,char activity[]){
 
-    return(tasks[id - ONE].instant > ZERO || (strcmp(activity,STAGE1) == true)
+    return(tasks[id - ONE].instant > ZERO && (strcmp(activity,STAGE1) == false)
           ); 
 }
 
 /*  verifies if a task has reached its last stage, DONE*/
-int taskDone(int id){
-    return((strcmp(tasks[id - ONE].activity.name,STAGE3) == false));
+int taskDone(char activity[]){
+    return(strcmp(STAGE3,activity) == false);
 }
 
-/* */
+
+/* checks for a valid activity name*/
+int testActivityLower(char activity[]){
+
+    int i;
+    for(i = 0; activity[i] != NUL; i++){
+        if(islower(activity[i])){
+            return true;
+        }
+    }
+    return false;
+}
+
+/* condition used in the sorting algorithm, sort by alphabetical order */
 int cmpInfo(int i, int j){
     return ((strcmp(tasks[i].info,tasks[j].info) < ZERO) ? true: false);
 }
 
+
+/* condition used in the sorting algorithm, sort by ascending order 
+of starting time */
 int cmpStartingTime(int i,int j){
     
     if(tasks[i].instant < tasks[j].instant){
@@ -340,36 +364,36 @@ int cmpStartingTime(int i,int j){
         return THREE;
     }  
 }
+
+
 /* prints list task message, command l*/
 void printListTask(int i){
+
     printf("%d %s #%d %s\n",tasks[i].id,tasks[i].activity.name,
     tasks[i].duration,tasks[i].info);
 }
 
+
 /* prints task in activity message, command d*/
 void printTaskActivity(int i){
 
-    printf("%d %d %s",tasks[i].id,tasks[i].instant,tasks[i].activity.name);
-
+    printf("%d %d %s\n",tasks[i].id,tasks[i].instant,tasks[i].info);
 }
 
 /* prints task in alphabetical order*/
-void printSortAlphabetical(int state){
+void printSortAlphabetical(){
     int i;
 
-    for(i = ZERO; i < tsk_counter; i++){
-            auxCMDL[i] = i; /*add values to an array of tasks indexes*/
+    for(i = 0; i < tsk_counter; i++){
+            auxCMD[i] = i; /*add values to an array of tasks indexes*/
     }
-    mergesort(auxCMDL,aux,ZERO,tsk_counter - ONE,ONE);
-    for(i = ZERO; i < tsk_counter; i++){
-        if(state == ZERO) /*output format: command l*/
-            printListTask(auxCMDL[i]);
-        else
-            printTaskActivity(auxCMDL[i]);/*output format: command d*/
+    mergesort(auxCMD,aux,ZERO,tsk_counter - ONE,ONE);
+    for(i = 0; i < tsk_counter; i++){ /*output format: command l*/
+            printListTask(auxCMD[i]);
     }
 }
 
-/* checks conditions associated with command d*/
+/* checks conditions associated with command l*/
 void listTasksValid(int c, int i,int k){
     if(!(isspace(c))){ /*checks for characters != whitespace*/
         if(isTaskinSystem((c - ZEROCHAR)) == true){
@@ -422,6 +446,9 @@ void testCreateActivity( char activity[]){
     if(isActivityInfoDuplicated(activity)){
         printf("%s\n",ACTDUPLICATED);
     }
+    else if(testActivityLower(activity) == true){
+        printf("invalid description");
+    }
     else if(act_counter > ACTIVITYMAX ){
         printf("%s\n",MAXACT);
     }
@@ -429,8 +456,69 @@ void testCreateActivity( char activity[]){
         strcpy(activities[act_counter].name,activity);
         act_counter++;/*increases the number of activities in the system*/
     }
-
 }
+
+/*  tests for erros associated with command m or moves to 
+    a given activity*/
+void testMoveTask(int id,char user[], char activity[]){
+
+    int slack,duration;
+    slack = duration = 0;
+
+    if(isTaskinSystem(id) == false){ 
+        printf("%s\n",TASKFSYSTEM);return;
+    }
+    else if(taskAlreadyStarted(id,activity)){
+        printf("%s\n",TASKTSTARTED);return;
+    }
+    else if(isUserinSystem(user) == false){
+        printf("%s\n",USERFSYSTEM);return;
+    }
+    else if((isActivityinSystem(activity) == false)){
+        printf("%s\n",ACTFSYSTEM);return;
+    }
+    if(taskDone(activity)){
+        duration = clock - tasks[id - ONE].instant;
+        slack = duration -  tasks[id - ONE].duration; 
+        printf("%s=%d %s=%d\n",DURATION,duration,SLACK,slack);
+        strcpy(tasks[id-ONE].activity.name,activity);   
+    }
+    else{
+        if(tasks[id-ONE].instant == ZERO){
+            /*updates the starting time of a given activity*/
+            tasks[id-ONE].instant = clock;
+            strcpy(tasks[id-ONE].user.name,user); 
+            strcpy(tasks[id-ONE].activity.name,activity);
+        }
+        else{
+            strcpy(tasks[id-ONE].user.name,user);
+            strcpy(tasks[id-ONE].activity.name,activity);
+        }
+    }
+}
+
+/* saves the id of tasks associated with the given activity*/
+void processActivity(char activity[],int counter){
+
+    int i;
+
+    for(i = 0; i < tsk_counter; i++){/*checks for activities equal to the given*/
+        if(strcmp(tasks[i].activity.name,activity) == false){
+            listby_idCMDd[i] = tasks[i].id;/*saves the id of tasks which the
+            associated activity is the given one*/
+            counter++; /* counts the number occurrences of tasks associated 
+            with the given activity*/
+        }
+    }
+    for(i = 0; i < tsk_counter; i++){
+            auxCMD[i] = i; /*add values to an array of tasks indexes*/
+    }
+    mergesort(auxCMD,aux,ZERO,counter -ONE,ZERO);
+    for(i = 0; i < counter; i++){
+        printTaskActivity(auxCMD[i]);
+    }
+}
+
 /*---------------------------------------------------------------------------*/
 
 /*
@@ -485,17 +573,19 @@ void addTaskToSystem(){
  */
 void  listTask(){ 
 
-    int c,i,k,savechar;
+    int c,i,k,savechar,testchar;
     k = ZERO, i = ONE;
 
-     /*removes the first white space immediately after the l command */ 
-    getchar();            
-     /*saves the character after the whitespace to use later*/  
-    savechar = getchar();
-    if(!(isspace(savechar))){/*verifies if we're dealing with a list tasks by 
-                            alphabetical order or by order of the given ids*/
+     /*removes the first whitespace/ newline character immediately*/ 
+    testchar = getchar();  /*after the l command*/
 
-  /*converts to the correspondent integer and checks if task in the system*/                    
+    if(testchar == NLINE){/*lists tasks by alphabetical order of description*/
+        printSortAlphabetical(ZERO);
+    }
+    else{ /*list by order of the given ids*/
+  /*converts to the correspondent integer and checks if task in the system*/
+            /*saves the character after the whitespace to use later*/  
+        savechar = getchar();                    
         if(isTaskinSystem((savechar - ZEROCHAR)) == true){
              listby_id[ZERO] = (savechar - ZEROCHAR);
               /*lists tasks by order of the given ids*/
@@ -510,11 +600,7 @@ void  listTask(){
             listTasksValid(c,i,k);
         }
     }
-    /*lists tasks by alphabetical order of description*/
-    else{
-        printSortAlphabetical(ZERO);
-    }    
-} 
+}
 
 /*
  *  Function: advanceTimeSystem
@@ -559,19 +645,14 @@ void  advanceTimeSystem(){
 void  addUserListUser(){       
 
     char user[USERNAME];
-    int i = ONE,j,savechar,c;     
-
-    /*removes the first white space immediately after the u command */           
-    getchar();
+    int i = ZERO,j,savechar,c;     
+    
     /*saves the character after the whitespace to use later*/  
     savechar = getchar();
 
-    /*checks whether or not the saved character is a whitespace */
-    if(!(isspace(savechar))){/*verifies if we're dealing with a list users or a
+    /*checks whether or not the saved character is a newline */
+    if(savechar != NLINE){/*verifies if we're dealing with a list users or a
                               create user command*/
-
-        /*saves the first non whitespace character to an auxiliary array*/                        
-        user[ZERO] = savechar; 
         while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
             user[i++] = c;
         }
@@ -585,6 +666,7 @@ void  addUserListUser(){
         }
     } 
 }
+
 
 /*
  *  Function: moveTask
@@ -605,38 +687,12 @@ void  addUserListUser(){
 
 void moveTask(){
 
-    int id,duration,slack;
+    int id;
     char user[USERNAME], activity[ACTIVITYINFO];
 
     scanf("%d %s %[^\n]s",&id,user,activity);
- 
-    if(isTaskinSystem(id) == false){ /*tests for errors*/
-        printf("%s\n",TASKFSYSTEM);
-    }
-    else if(taskAlreadyStarted(id,activity)){
-        printf("%s\n",TASKTSTARTED);
-    }
-    else if(isUserinSystem(user) == false){
-        printf("%s\n",USERFSYSTEM);
-    }
-    else if((isActivityinSystem(activity) == false)){
-        printf("%s\n",ACTFSYSTEM);
-    }
-    else{
-        /*updates the starting time of a given activity*/
-        tasks[id-ONE].instant = clock;
-        duration = tasks[id - ONE].instant - clock; 
-        slack = duration -  tasks[id - ONE].duration;
-        /*printf("%d",duration);
-        printf("%d",duration);*/
-        strcpy(tasks[id-ONE].user.name,user); 
-        strcpy(tasks[id-ONE].activity.name,activity);
-
-        if(taskDone(id)){
-            printf("%s=%d %s=%d\n",DURATION,duration,SLACK,slack);
-
-        } 
-    }
+    /*tests for errors and moves a task if possible*/
+    testMoveTask(id,user,activity);
 }
 
 /*
@@ -653,24 +709,19 @@ void moveTask(){
 
 void listTaskActvity(){     
 
-    /*int i,k = 0 ;*/
     char activity[ACTIVITYINFO];
+    int counter = ZERO;
+    /*removes the first white space immediately after the u command */    
+    getchar();   
 
-    getchar();             
     scanf("%[^\n]s",activity);
-    printf("%s\n",activity);
-
+    /*tests for errors*/
     if(isActivityinSystem(activity)== false){
         printf("%s\n",ACTFSYSTEM);
     }
     else{
-        if(strcmp(STAGE1,activity)== false){
-
-
-        }
+        processActivity(activity,counter);
     }
-
-
 }
 
 /*
@@ -690,35 +741,28 @@ void listTaskActvity(){
 
 void addOrListActivity(){  
 
-    int savechar,c,i=ONE,j;
+    int savechar,c,i= ZERO,j;
     char activity[ACTIVITYINFO];
 
-    getchar();              
     savechar = getchar();  
 
-    if(!(isspace(savechar))){/*verifies if we're dealing with a list activities
+    if(savechar != NLINE){/*verifies if we're dealing with a list activities
                              or a create activity command*/
         /*saves the first non whitespace character to an auxiliary array*/
-        activity[0] = savechar;
 	    while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
-            if(islower(c)){    /*checks for nonvalid characters*/
-                printf("%s\n",NONVALIDINFO);
-                break;
-            }
             activity[i++] = c; 
         }
         activity[i] = NUL;
         testCreateActivity(activity);
     }
-    else{             /*lists all activities in the system by insertion order*/
-            for(j = 0; j < act_counter; j++){
-                printf("%s\n",activities[j].name);
-            }
+    else{  
+                   /*lists all activities in the system by insertion order*/
+        for(j = 0; j < act_counter; j++){
+            printf("%s\n",activities[j].name);
+        }
     }
 
 }
-
-
 
 /*  sorting*/
 
@@ -738,10 +782,10 @@ void mergesort(int a[],int aux[],int l, int r,int sortformat){
 	int m = (r + l) / 2;
 	if (r <= l) return;
 
-	mergesort(a,aux, l, m,sortformat);     /* sorts the left part of the array */
-	mergesort(a,aux, m + 1, r,sortformat); /* sorts the right part of the array */
-	merge(a,aux, l, m, r,sortformat);      /* merges both sorted arrays into 
-                                            one sorted array */
+	mergesort(a,aux, l, m,sortformat);  /* sorts the left part of the array*/
+	mergesort(a,aux, m + 1, r,sortformat);/*sorts the right part of the array*/
+	merge(a,aux, l, m, r,sortformat);  /*merges both sorted arrays into 
+                                       one sorted array */
 }
 
 void merge(int a[],int aux[],int l, int m, int r,int sortformat){
@@ -749,16 +793,16 @@ void merge(int a[],int aux[],int l, int m, int r,int sortformat){
 	
     int i, j, k;
     for (i = m + 1; i > l; i--)  /*builds the aux array */
-	aux[i - 1] = a[i - 1];
+	    aux[i - 1] = a[i - 1];
     for (j = m; j < r; j++)
-	aux[r + m - j] = a[j + 1];
+	    aux[r + m - j] = a[j + 1];
 	                        /*sorts the aux array*/
     if(sortformat == ONE){ /* sorts alphabetically*/
         for (k = l; k <= r; k++){
             if(cmpInfo(aux[j],aux[i]))
-	    	 a[k] = aux[j--];
-	     else
-	  	 a[k] = aux[i++];
+	    	    a[k] = aux[j--];
+	        else
+	  	    a[k] = aux[i++];
         }
     }
     else{/*sorts by starting time**/
@@ -768,12 +812,11 @@ void merge(int a[],int aux[],int l, int m, int r,int sortformat){
             else if(cmpStartingTime(aux[j],(aux[i])) == false){
                 a[k] = aux[i++];
             }else if(cmpStartingTime(aux[j],(aux[i])) == THREE){
-                if(cmpInfo(aux[j],aux[i])) /*in a tie situation the tiebreaker is the task's description*/
-			        a[k] = aux[j--];
+                if(cmpInfo(aux[j],aux[i])) /*in a tie situation the tiebreaker*/
+			        a[k] = aux[j--];       /*is the task's description*/
 		        else
 			        a[k] = aux[i++];
             }
         }
     }
 }
-
