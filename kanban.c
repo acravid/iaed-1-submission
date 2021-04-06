@@ -18,9 +18,8 @@
 #define START 1        /*true value for the command line parsing*/
 #define TASKSMAX  10000/*maximum number of tasks*/ 
 #define TASKINFO 50    /*maximum number of characters of a task description*/
-#define ACTIVITYMAX 13 /*maximum number of activities in the system --> 10
-however, the value of ACTIVITYMAX 13 already takes in account the three 
-standard actvitities */
+#define ACTIVITYMAX 10 /*maximum number of activities in the system --> 10
+however, this value already takes in account the three standard actvitities */
 #define ACTIVITYINFO 21/*maximum number of characters of an activity description*/
 #define USERMAX 50     /*maximum number of users in the system*/
 #define USERNAME 20    /*maximum number of characters of an user description*/
@@ -256,7 +255,7 @@ int isTaskInfoDuplicated(char s[]){
     int i;
     
     for(i = 0; i < tsk_counter;i++){
-        if(strcmp(users[i].name,s) == false){
+        if(strcmp(tasks[i].info,s) == false){
             return true;
         }
     }
@@ -268,7 +267,7 @@ int isActivityInfoDuplicated(char s[]){
 
     int i;
     
-    for(i = THREE; i < act_counter;i++){
+    for(i = 0; i < act_counter;i++){
         if(strcmp(activities[i].name,s) == false){
             return true;
         }
@@ -320,7 +319,7 @@ int isActivityinSystem(char activity[]){
 int taskAlreadyStarted(int id,char activity[]){
 
     return(tasks[id - ONE].instant > ZERO && (strcmp(activity,STAGE1) == false)
-          ); 
+          );
 }
 
 /*  verifies if a task has reached its last stage, DONE*/
@@ -399,10 +398,10 @@ void listTasksValid(int c, int i,int k){
             printListTask(listby_id[i]-ONE);
             i++;
             k++;      
-            }
-            else{
-                printf("%s\n",TASKFSYSTEM);
-            }  
+        }
+        else{
+            printf("%d: %s\n",(c-ZEROCHAR),TASKFSYSTEM);
+        }  
     }
 }
 
@@ -431,7 +430,7 @@ void createUserValid(char user[]){
     if(isUserinSystem(user)){  /*tests for errors*/
             printf("%s\n",USERINSYSTEM);
     }
-    else if(usr_counter > USERMAX){
+    else if(usr_counter >= USERMAX){
         printf("%s\n",MAXUSERS);
     }
 }
@@ -444,15 +443,15 @@ void testCreateActivity( char activity[]){
         printf("%s\n",ACTDUPLICATED);
     }
     else if(testActivityLower(activity) == true){
-        printf("invalid description");
+        printf("invalid description\n");
     }
-    else if(act_counter > ACTIVITYMAX ){
+    else if(act_counter >= ACTIVITYMAX ){
         printf("%s\n",MAXACT);
     }
     else{             /*creates a new activity*/
         strcpy(activities[act_counter].name,activity);
         act_counter++;/*increases the number of activities in the system*/
-    }
+    }   
 }
 
 /*  tests for erros associated with command m or moves to 
@@ -465,7 +464,8 @@ void testMoveTask(int id,char user[], char activity[]){
     if(isTaskinSystem(id) == false){ 
         printf("%s\n",TASKFSYSTEM);return;
     }
-    else if(taskAlreadyStarted(id,activity)){
+    else if(taskAlreadyStarted(id,activity) ||
+    ((tasks[id - ONE].instant == ZERO) && (strcmp(activity,STAGE1) == false))){
         printf("%s\n",TASKTSTARTED);return;
     }
     else if(isUserinSystem(user) == false){
@@ -479,9 +479,10 @@ void testMoveTask(int id,char user[], char activity[]){
             tasks[id-ONE].instant = clock;
             strcpy(tasks[id-ONE].user.name,user); 
             strcpy(tasks[id-ONE].activity.name,activity);
+
             duration = clock - tasks[id - ONE].instant;
             slack = duration -  tasks[id - ONE].duration;
-            if(taskDone(activity)){ 
+            if(taskDone(activity)){ /*checks for task in stage 3,DONE*/
                 printf("%s=%d %s=%d\n",DURATION,duration,SLACK,slack);
             }
     }
@@ -544,7 +545,7 @@ void addTaskToSystem(){
     scanf("%[^\n]s",info); /*the description cannot start with a whitespace*/
   
     if(!(info[0] == NUL) && nonNegativeIntChecker(duration)){
-        if(tsk_counter > TASKSMAX){
+        if(tsk_counter > (TASKSMAX-ONE)){
             printf("%s\n",MAXTASKS);
         }
         else if(isTaskInfoDuplicated(info)){
@@ -593,7 +594,7 @@ void  listTask(){
              k++;
         }
         else{
-            printf("%s\n",TASKFSYSTEM);
+            printf("%d: %s\n",(savechar- ZEROCHAR),TASKFSYSTEM);
             i = ZERO;
         }
         while((c = getchar())!= '\n' && c != EOF){
