@@ -66,8 +66,8 @@ typedef enum {false = ZERO,true = !false} boolean;
  * Description: Activity structure definition
  * A task is characterized by the following:
  * 
- *         * a name,       what is it with want to accomplish 
- * 
+ *         * a name,      
+ *
  */
 
 typedef struct{
