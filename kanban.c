@@ -514,14 +514,15 @@ void processIds(){
 
     int i=0,size;
 	char final; 
+    
 	do{
 	  	scanf("%d%c", &listby_id[i], &final); 
 	  	i++; 
         size++;
 	  	} while(final!= '\n');
   	
-  	size=i;
 
+  	size=i;
   	for(i=0;i< size;i++){ 
         if(isTaskinSystem(listby_id[i]) == true){
             printListTask(listby_id[i]-ONE);
