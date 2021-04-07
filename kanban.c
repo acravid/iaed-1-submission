@@ -20,7 +20,7 @@
 #define TASKINFO 50    /*maximum number of characters of a task description*/
 #define ACTIVITYMAX 10 /*maximum number of activities in the system --> 10
 however, this value already takes in account the three standard actvitities */
-#define ACTIVITYINFO 21/*maximum number of characters of an activity description*/
+#define ACTIVITYINFO 20/*maximum number of characters of an activity description*/
 #define USERMAX 50     /*maximum number of users in the system*/
 #define USERNAME 20    /*maximum number of characters of an user description*/
 #define ZERO 0         /*comparison/computation value*/
@@ -313,10 +313,10 @@ int isActivityinSystem(char activity[]){
 
     for(i = 0; i < act_counter; i++){
         if(strcmp(activities[i].name,activity) == false){
-            return true;
+                return true;
         }
-    }
-    return false;
+    }return false;
+
 }
 
 /*  verifies if a task already started*/
@@ -447,7 +447,6 @@ void testCreateActivity( char activity[]){
 void testMoveTask(int id,char user[], char activity[]){
 
     int slack,duration;
-    slack = duration = 0;
 
     if(isTaskinSystem(id) == false){ 
         printf("%s\n",TASKFSYSTEM);return;
@@ -512,16 +511,14 @@ void processActivity(char activity[],int counter){
    prints error message or standard message, command l*/
 void processIds(){
 
-    int i=0,size;
+    int i,size;
 	char final; 
-    
+    i = size = 0;
+
 	do{
 	  	scanf("%d%c", &listby_id[i], &final); 
 	  	i++; 
-        size++;
 	  	} while(final!= '\n');
-  	
-
   	size=i;
   	for(i=0;i< size;i++){ 
         if(isTaskinSystem(listby_id[i]) == true){
@@ -568,7 +565,9 @@ void addTaskToSystem(){
         }
         else{
             /*creates a new task */
-            createTask(duration,info);
+            if(strlen(info) <= TASKINFO){
+                createTask(duration,info);
+            }
         }       
     }
     else{
@@ -654,7 +653,7 @@ void  addUserListUser(){
     /*checks whether or not the saved character is a newline */
     if(savechar != NLINE){/*verifies if we're dealing with a list users or a
                               create user command*/
-        while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < USERNAME){
+        while ((c=getchar())!='\n' && c!=EOF && c!=' '&& i < (USERNAME-ONE)){
             user[i++] = c;
         }
         user[i] = NUL;
@@ -717,11 +716,13 @@ void listTaskActvity(){
 
     scanf("%[^\n]s",activity);
     /*tests for errors*/
-    if(isActivityinSystem(activity)== false){
-        printf("%s\n",ACTFSYSTEM);
-    }
-    else{
-        processActivity(activity,counter);
+    if(strlen(activity) <= ACTIVITYINFO){
+        if(isActivityinSystem(activity)== false){
+            printf("%s\n",ACTFSYSTEM);
+        }
+        else{
+            processActivity(activity,counter);
+        }
     }
 }
 
@@ -750,11 +751,15 @@ void addOrListActivity(){
     if(savechar != NLINE){/*verifies if we're dealing with a list activities
                              or a create activity command*/
         /*saves the first non whitespace character to an auxiliary array*/
-	    while ((c=getchar())!='\n' && c!=EOF && i < ACTIVITYINFO){
-            activity[i++] = c; 
+	    while ((c=getchar())!='\n' && c!=EOF && i < (ACTIVITYINFO+ONE)){
+            activity[i] = c; 
+            i++;
         }
         activity[i] = NUL;
-        testCreateActivity(activity);
+    
+        if(strlen(activity) <= ACTIVITYINFO){
+            testCreateActivity(activity);
+        }
     }
     else{  
                    /*lists all activities in the system by insertion order*/
