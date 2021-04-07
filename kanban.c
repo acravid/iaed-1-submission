@@ -513,25 +513,23 @@ void processActivity(char activity[],int counter){
 void processIds(){
 
     int i=0,size;
-	char final; 
+    char final; 
     
-	do{
-	  	scanf("%d%c", &listby_id[i], &final); 
-	  	i++; 
+    do{
+	scanf("%d%c", &listby_id[i], &final); 
+	i++; 
         size++;
-	  	} while(final!= '\n');
+    } while(final!= '\n');
   	
-
-  	size=i;
-  	for(i=0;i< size;i++){ 
+    size=i;
+    for(i=0;i< size;i++){ 
         if(isTaskinSystem(listby_id[i]) == true){
             printListTask(listby_id[i]-ONE);
         }
         else{
             printf("%d: %s\n",listby_id[i],TASKFSYSTEM);
         }
-
-  	} 
+    } 
 }
 
 
