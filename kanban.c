@@ -28,6 +28,7 @@ however, this value already takes in account the three standard actvitities */
 #define TWO 2          /*comparison/computation value*/
 #define ZERO 0         /*comparison/computation value*/
 #define THREE 3        /*computation value*/
+#define TEN            10
 #define STAGE1         "TO DO"       /* first stage of an activity*/
 #define STAGE2         "IN PROGRESS" /*second stage of an activity*/
 #define STAGE3         "DONE"        /*last stage of an activity*/
@@ -37,6 +38,9 @@ however, this value already takes in account the three standard actvitities */
 #define ZEROCHAR       '0'
 #define NUL            '\0'
 #define NLINE          '\n'
+#define SUM            '+'
+#define MINUS          '-'
+
 
 /* Macros used in error handling*/
 #define MAXTASKS       "too many tasks"
@@ -66,7 +70,7 @@ typedef enum {false = ZERO,true = !false} boolean;
  * Description: Activity structure definition
  * A task is characterized by the following:
  * 
- *         * a name,      
+ *         * a name    
  *
  */
 
@@ -174,7 +178,7 @@ void createUserValid(char user[]);
 void testMoveTask(int id,char user[], char activity[]);
 void processActivity(char activity[],int counter);
 void testCreateActivity(char activity[]);
-
+void processIds();
 /*  Sorting*/
 
 /*auxiliary arrays used in sorting,command l and d*/
@@ -389,22 +393,6 @@ void printSortAlphabetical(){
     }
 }
 
-/* checks conditions associated with command l*/
-void listTasksValid(int c, int i,int k){
-    if(!(isspace(c))){ /*checks for characters != whitespace*/
-        if(isTaskinSystem((c - ZEROCHAR)) == true){
-            listby_id[i] = c - ZEROCHAR;
-            /*lists tasks by order of the given ids*/
-            printListTask(listby_id[i]-ONE);
-            i++;
-            k++;      
-        }
-        else{
-            printf("%d: %s\n",(c-ZEROCHAR),TASKFSYSTEM);
-        }  
-    }
-}
-
 /*  creates a new task*/
 void createTask(int duration , char info[]){
 
@@ -520,6 +508,32 @@ void processActivity(char activity[],int counter){
     }
 }
 
+/* saves the ids given as input to an auxiliary array and 
+   prints error message or standard message, command l*/
+void processIds(){
+
+    int i=0,size;
+	char final; 
+	do{
+	  	scanf("%d%c", &listby_id[i], &final); 
+	  	i++; 
+        size++;
+	  	} while(final!= '\n');
+  	
+  	size=i;
+
+  	for(i=0;i< size;i++){ 
+        if(isTaskinSystem(listby_id[i]) == true){
+            printListTask(listby_id[i]-ONE);
+        }
+        else{
+            printf("%d: %s\n",listby_id[i],TASKFSYSTEM);
+        }
+
+  	} 
+}
+
+
 /*---------------------------------------------------------------------------*/
 
 /*
@@ -574,8 +588,7 @@ void addTaskToSystem(){
  */
 void  listTask(){ 
 
-    int c,i,k,savechar,testchar;
-    k = ZERO, i = ONE;
+    int testchar;
 
      /*removes the first whitespace/ newline character immediately*/ 
     testchar = getchar();  /*after the l command*/
@@ -584,22 +597,8 @@ void  listTask(){
         printSortAlphabetical(ZERO);
     }
     else{ /*list by order of the given ids*/
-  /*converts to the correspondent integer and checks if task in the system*/
-            /*saves the character after the whitespace to use later*/  
-        savechar = getchar();                    
-        if(isTaskinSystem((savechar - ZEROCHAR)) == true){
-             listby_id[ZERO] = (savechar - ZEROCHAR);
-              /*lists tasks by order of the given ids*/
-             printListTask(listby_id[ZERO]-ONE);
-             k++;
-        }
-        else{
-            printf("%d: %s\n",(savechar- ZEROCHAR),TASKFSYSTEM);
-            i = ZERO;
-        }
-        while((c = getchar())!= '\n' && c != EOF){
-            listTasksValid(c,i,k);
-        }
+     /*converts to the correspondent integer and checks if task in the system*/
+        processIds();               
     }
 }
 
