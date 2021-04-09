@@ -38,9 +38,6 @@ however, this value already takes in account the three standard actvitities */
 #define ZEROCHAR       '0'
 #define NUL            '\0'
 #define NLINE          '\n'
-#define SUM            '+'
-#define MINUS          '-'
-
 
 /* Macros used in error handling*/
 #define MAXTASKS       "too many tasks"
