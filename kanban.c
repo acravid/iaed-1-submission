@@ -508,6 +508,7 @@ void processActivity(char activity[],int counter){
    prints error message or standard message, command l*/
 void processIds(){
 
+<<<<<<< HEAD
     int i,size;
 	char final; 
     i = size = 0;
@@ -518,14 +519,26 @@ void processIds(){
 	  	} while(final!= '\n');
   	size=i;
   	for(i=0;i< size;i++){ 
+=======
+    int i=0,size;
+    char final; 
+    
+    do{
+	scanf("%d%c", &listby_id[i], &final); 
+	i++; 
+        size++;
+    } while(final!= '\n');
+  	
+    size=i;
+    for(i=0;i< size;i++){ 
+>>>>>>> e32f2525ab11c8781fda0a07d92b14d7ebad33c2
         if(isTaskinSystem(listby_id[i]) == true){
             printListTask(listby_id[i]-ONE);
         }
         else{
             printf("%d: %s\n",listby_id[i],TASKFSYSTEM);
         }
-
-  	} 
+    } 
 }
 
 
