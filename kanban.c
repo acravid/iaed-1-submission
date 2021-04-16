@@ -520,10 +520,13 @@ void processIds(){
 	char final; 
     
 	do{
+
 	  	scanf("%d%c", &listby_id[i], &final); 
 	  	i++; 
         size++;
-	  	} while(final!= '\n');
+        
+	}
+    while(final!= '\n');
   	
 
   	size=i;
@@ -829,7 +832,7 @@ void merge(int a[],int aux[],int l, int m, int r,int sortformat){
 		        else
 			        a[k] = aux[i++];
             }else{
-                a[k] = aux[i++];
+                    a[k] = aux[i++];
             }
         }
     }
