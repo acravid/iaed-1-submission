@@ -19,7 +19,7 @@
 #define TASKSMAX  10000/*maximum number of tasks*/ 
 #define TASKINFO 50    /*maximum number of characters of a task description*/
 #define ACTIVITYMAX 10 /*maximum number of activities in the system --> 10
-however, this value already takes in account the three standard actvitities */
+however, this value already takes in account the three standard activities */
 #define ACTIVITYINFO 21/*maximum number of characters of an activity description*/
 #define USERMAX 50     /*maximum number of users in the system*/
 #define USERNAME 20    /*maximum number of characters of an user description*/
@@ -201,7 +201,7 @@ int  main(){
     char cmd;
     act_counter = THREE; /* sets the activity counter to 3*/
     
-    /*the system already has beforehand three different activites
+    /*the system already has beforehand three different activities
     i.e. TO DO (STAGE1), IN PROGRESS (STAGE2) and DONE (STAGE3) */
     strcpy(activities[ZERO].name,STAGE1);strcpy(activities[ONE].name,STAGE2);
     strcpy(activities[TWO].name,STAGE3);
@@ -299,8 +299,8 @@ int isTaskinSystem(int id){
     int i;
 
     for(i = ONE; i <= tsk_counter; i++){
-        if(tasks[i - ONE].id == id){ /*id starts at one, */
-            return true;                     /*the - ONE removes the offset*/
+        if(tasks[i - ONE].id == id){ 
+            return true;        
         }
     }
     return false;
@@ -424,7 +424,7 @@ void testCreateActivity( char activity[]){
     }   
 }
 
-
+/*  moves a task from an activity to another*/
 void moveTaskA(int id,char user[], char activity[]){
 
      int slack,duration;
@@ -490,7 +490,7 @@ void testMoveTask(int id,char user[], char activity[]){
     }
 }
 
-/* saves the id of tasks associated with the given activity*/
+/* saves the ids of tasks associated with the given activity*/
 void processActivity(char activity[]){
 
     int i,counter = ZERO;
